@@ -29,7 +29,7 @@ repositories {
 
 val springdocVersion = "3.0.1"
 val jjwtVersion = "0.13.0"
-val flywayVersion = "12.7.0"
+val flywayVersion = "12.8.1"
 val mockitoKotlinVersion = "6.1.0"
 
 dependencies {
