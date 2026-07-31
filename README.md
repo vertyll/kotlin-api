@@ -40,4 +40,5 @@ Showcase Kotlin and Spring Boot API.
 - ktlint for static code analysis and maintaining consistent code quality
 - Docker for development environment
 
-> **Note:** During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
+> [!NOTE]
+> During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
