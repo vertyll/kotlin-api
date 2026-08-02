@@ -41,4 +41,5 @@ Showcase Kotlin and Spring Boot API.
 - Docker for development environment
 
 > [!NOTE]
+>
 > During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
