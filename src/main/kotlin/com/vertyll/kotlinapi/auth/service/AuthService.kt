@@ -27,8 +27,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.security.SecureRandom
 import java.time.LocalDateTime
-import java.util.Random
 
 @Service
 class AuthService(
@@ -51,6 +51,8 @@ class AuthService(
         private const val VERIFICATION_CODE_RANGE = 900000
         private const val VERIFICATION_TOKEN_EXPIRY_HOURS = 24L
         private const val MILLIS_IN_SECOND = 1000
+
+        private val secureRandom = SecureRandom()
     }
 
     @Transactional
@@ -223,8 +225,7 @@ class AuthService(
     }
 
     private fun generateVerificationCode(): String {
-        val random = Random()
-        val code = VERIFICATION_CODE_MIN + random.nextInt(VERIFICATION_CODE_RANGE)
+        val code = VERIFICATION_CODE_MIN + secureRandom.nextInt(VERIFICATION_CODE_RANGE)
         return code.toString()
     }
 
