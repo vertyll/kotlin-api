@@ -1,11 +1,11 @@
 plugins {
-    kotlin("jvm") version "2.4.0"
-    kotlin("plugin.spring") version "2.4.0"
-    kotlin("plugin.jpa") version "2.4.0"
+    kotlin("jvm") version "2.4.10"
+    kotlin("plugin.spring") version "2.4.10"
+    kotlin("plugin.jpa") version "2.4.10"
     id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
-    id("dev.detekt") version "2.0.0-alpha.5"
+    id("dev.detekt") version "2.0.0-alpha.6"
 }
 
 group = "com.vertyll"
@@ -29,8 +29,9 @@ repositories {
 
 val springdocVersion = "3.0.1"
 val jjwtVersion = "0.13.0"
-val flywayVersion = "12.10.0"
+val flywayVersion = "13.3.0"
 val mockitoKotlinVersion = "6.1.0"
+val detektVersion = "2.0.0-alpha.6"
 
 dependencies {
     // Spring Boot and Kotlin dependencies
@@ -86,7 +87,7 @@ kotlin {
 }
 
 detekt {
-    toolVersion = "2.0.0-alpha.5"
+    toolVersion = detektVersion
     config.setFrom(files("$projectDir/config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
 }
