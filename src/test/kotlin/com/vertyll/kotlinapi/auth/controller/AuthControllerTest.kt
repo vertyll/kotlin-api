@@ -5,6 +5,7 @@ import com.vertyll.kotlinapi.auth.dto.AuthResponseDto
 import com.vertyll.kotlinapi.auth.dto.ChangeEmailRequestDto
 import com.vertyll.kotlinapi.auth.dto.ChangePasswordRequestDto
 import com.vertyll.kotlinapi.auth.dto.RegisterRequestDto
+import com.vertyll.kotlinapi.auth.dto.SessionResponseDto
 import com.vertyll.kotlinapi.auth.service.AuthService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -22,6 +23,7 @@ import org.mockito.quality.Strictness
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import java.time.LocalDateTime
 
 @ExtendWith(MockitoExtension::class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -135,7 +137,7 @@ class AuthControllerTest {
         // given
         val sessions =
             listOf(
-                mapOf("id" to 1L, "deviceInfo" to "Device 1", "createdAt" to "2023-01-01"),
+                SessionResponseDto(id = 1L, deviceInfo = "Device 1", createdAt = LocalDateTime.of(2023, 1, 1, 0, 0)),
             )
         `when`(authService.getUserActiveSessions(testEmail)).thenReturn(sessions)
 

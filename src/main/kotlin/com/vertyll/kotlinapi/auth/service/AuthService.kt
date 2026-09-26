@@ -6,6 +6,7 @@ import com.vertyll.kotlinapi.auth.dto.ChangeEmailRequestDto
 import com.vertyll.kotlinapi.auth.dto.ChangePasswordRequestDto
 import com.vertyll.kotlinapi.auth.dto.RegisterRequestDto
 import com.vertyll.kotlinapi.auth.dto.ResetPasswordRequestDto
+import com.vertyll.kotlinapi.auth.dto.SessionResponseDto
 import com.vertyll.kotlinapi.auth.enums.VerificationTokenType
 import com.vertyll.kotlinapi.auth.model.VerificationToken
 import com.vertyll.kotlinapi.auth.repository.VerificationTokenRepository
@@ -183,7 +184,7 @@ class AuthService(
     }
 
     @Transactional
-    fun getUserActiveSessions(email: String): List<Map<String, Any>> {
+    fun getUserActiveSessions(email: String): List<SessionResponseDto> {
         val user =
             userRepository
                 .findByEmailWithRoles(email)
@@ -192,10 +193,10 @@ class AuthService(
         return refreshTokenService
             .getUserActiveSessions(user)
             .map { token ->
-                mapOf<String, Any>(
-                    "id" to (token.id ?: 0L),
-                    "deviceInfo" to (token.deviceInfo ?: "Unknown device"),
-                    "createdAt" to (token.createdAt ?: ""),
+                SessionResponseDto(
+                    id = requireNotNull(token.id),
+                    deviceInfo = token.deviceInfo,
+                    createdAt = requireNotNull(token.createdAt),
                 )
             }
     }

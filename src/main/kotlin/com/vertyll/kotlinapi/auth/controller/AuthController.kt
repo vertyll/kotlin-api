@@ -6,6 +6,7 @@ import com.vertyll.kotlinapi.auth.dto.ChangeEmailRequestDto
 import com.vertyll.kotlinapi.auth.dto.ChangePasswordRequestDto
 import com.vertyll.kotlinapi.auth.dto.RegisterRequestDto
 import com.vertyll.kotlinapi.auth.dto.ResetPasswordRequestDto
+import com.vertyll.kotlinapi.auth.dto.SessionResponseDto
 import com.vertyll.kotlinapi.auth.service.AuthService
 import com.vertyll.kotlinapi.common.exception.ApiException
 import com.vertyll.kotlinapi.config.ProblemSecurityHandlers
@@ -73,7 +74,7 @@ class AuthController(
     @GetMapping("/sessions")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get all active sessions for the current user")
-    fun getSessions(): List<Map<String, Any>> {
+    fun getSessions(): List<SessionResponseDto> {
         val authentication =
             SecurityContextHolder.getContext().authentication
                 ?: throw ApiException(ProblemSecurityHandlers.AUTHENTICATION_REQUIRED, HttpStatus.UNAUTHORIZED)
