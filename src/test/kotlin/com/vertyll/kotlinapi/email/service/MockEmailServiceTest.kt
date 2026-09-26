@@ -55,23 +55,4 @@ class MockEmailServiceTest {
         assertTrue(logsList.any { it.message.contains("Subject: $subject") })
         assertTrue(logsList.any { it.message.contains("Email would be sent in production environment") })
     }
-
-    @Test
-    fun `sendEmail should handle null email template`() {
-        // given
-        val to = "test@example.com"
-        val username = "Test User"
-        val emailTemplate = null
-        val activationCode = "123456"
-        val subject = "Test Subject"
-
-        // when
-        mockEmailService.sendEmail(to, username, emailTemplate, activationCode, subject)
-
-        // then
-        val logsList = listAppender.list
-
-        // Verify template fallback is used
-        assertTrue(logsList.any { it.message.contains("Template: confirm-email") })
-    }
 }

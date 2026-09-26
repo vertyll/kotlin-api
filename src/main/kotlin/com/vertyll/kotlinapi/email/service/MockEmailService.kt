@@ -18,14 +18,14 @@ class MockEmailService : IEmailService {
     override fun sendEmail(
         to: String,
         username: String,
-        emailTemplate: EmailTemplateName?,
+        emailTemplate: EmailTemplateName,
         activationCode: String,
         subject: String,
     ) {
         logger.info("MOCK EMAIL SERVICE")
         logger.info("To: $to")
         logger.info("Username: $username")
-        logger.info("Template: ${emailTemplate?.name ?: "confirm-email"}")
+        logger.info("Template: ${emailTemplate.name}")
         logger.info("Activation Code: $activationCode")
         logger.info("Subject: $subject")
         logger.info("Email would be sent in production environment")
