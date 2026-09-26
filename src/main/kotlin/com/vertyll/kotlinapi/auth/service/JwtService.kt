@@ -1,11 +1,11 @@
 package com.vertyll.kotlinapi.auth.service
 
+import com.vertyll.kotlinapi.config.JwtProperties
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.security.Key
@@ -17,20 +17,9 @@ import javax.crypto.SecretKey
 
 @Service
 class JwtService(
-    private val clock: Clock = Clock.systemUTC(),
+    private val properties: JwtProperties,
+    private val clock: Clock,
 ) {
-    @Value($$"${security.jwt.secret-key}")
-    private lateinit var secretKey: String
-
-    @Value($$"${security.jwt.access-token-expiration}")
-    private var accessTokenExpiration: Long = 0
-
-    @Value($$"${security.jwt.refresh-token-expiration}")
-    private var refreshTokenExpiration: Long = 0
-
-    @Value($$"${security.jwt.refresh-token-cookie-name}")
-    private lateinit var refreshTokenCookieName: String
-
     fun extractUsername(token: String): String = extractClaim(token) { it.subject }
 
     fun generateToken(userDetails: UserDetails): String = generateToken(emptyMap(), userDetails)
@@ -45,7 +34,7 @@ class JwtService(
             .claims(extraClaims)
             .subject(userDetails.username)
             .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plus(accessTokenExpiration, ChronoUnit.MILLIS)))
+            .expiration(Date.from(now.plus(properties.accessTokenExpiration, ChronoUnit.MILLIS)))
             .signWith(getSigningKey())
             .compact()
     }
@@ -62,14 +51,14 @@ class JwtService(
             .claims(extraClaims)
             .subject(userDetails.username)
             .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plus(refreshTokenExpiration, ChronoUnit.MILLIS)))
+            .expiration(Date.from(now.plus(properties.refreshTokenExpiration, ChronoUnit.MILLIS)))
             .signWith(getSigningKey())
             .compact()
     }
 
-    fun getRefreshTokenCookieName(): String = refreshTokenCookieName
+    fun getRefreshTokenCookieName(): String = properties.refreshTokenCookieName
 
-    fun getRefreshTokenExpirationTime(): Long = refreshTokenExpiration
+    fun getRefreshTokenExpirationTime(): Long = properties.refreshTokenExpiration
 
     fun isTokenValid(
         token: String,
@@ -107,12 +96,12 @@ class JwtService(
         }
 
     private fun getSigningKey(): Key {
-        val keyBytes = Decoders.BASE64.decode(secretKey)
+        val keyBytes = Decoders.BASE64.decode(properties.secretKey)
         return Keys.hmacShaKeyFor(keyBytes)
     }
 
     private fun getVerificationKey(): SecretKey {
-        val keyBytes = Decoders.BASE64.decode(secretKey)
+        val keyBytes = Decoders.BASE64.decode(properties.secretKey)
         return Keys.hmacShaKeyFor(keyBytes)
     }
 }

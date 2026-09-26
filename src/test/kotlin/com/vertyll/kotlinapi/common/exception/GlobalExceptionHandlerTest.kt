@@ -1,19 +1,18 @@
 package com.vertyll.kotlinapi.common.exception
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.authentication.DisabledException
-import org.springframework.security.authentication.LockedException
+import org.springframework.http.ProblemDetail
 import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 class GlobalExceptionHandlerTest {
     private lateinit var handler: GlobalExceptionHandler
@@ -23,118 +22,91 @@ class GlobalExceptionHandlerTest {
         handler = GlobalExceptionHandler()
     }
 
+    private fun ProblemDetail.property(name: String): Any? = properties?.get(name)
+
     @Test
-    fun handleApiException_ShouldReturnCorrectResponse() {
+    fun handleApiException_ShouldReturnProblemWithKeyAndArgs() {
         // given
-        val ex = ApiException("test message", HttpStatus.BAD_REQUEST)
+        val ex = ApiException("errors.role.notFound", HttpStatus.NOT_FOUND, mapOf("id" to 7))
 
         // when
-        val response = handler.handleApiException(ex)
+        val problem = handler.handleApiException(ex)
 
         // then
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertEquals("test message", response.body!!.message)
+        assertEquals(HttpStatus.NOT_FOUND.value(), problem.status)
+        assertEquals("errors.role.notFound", problem.detail)
+        assertEquals("errors.role.notFound", problem.property(Problems.CODE_PROPERTY))
+        assertEquals(mapOf("id" to 7), problem.property(Problems.ARGS_PROPERTY))
     }
 
     @Test
-    fun handleValidationException_ShouldReturnValidationErrorResponse() {
+    fun handleApiException_ShouldOmitEmptyArgs() {
+        // when
+        val problem = handler.handleApiException(ApiException("errors.user.notFound", HttpStatus.NOT_FOUND))
+
+        // then
+        assertNull(problem.property(Problems.ARGS_PROPERTY))
+    }
+
+    @Test
+    fun handleValidationException_ShouldGroupKeysByField() {
         // given
         val ex = mock(MethodArgumentNotValidException::class.java)
         val bindingResult = mock(BindingResult::class.java)
-        val fieldError = FieldError("object", "username", "Username is required")
-
+        val errors =
+            listOf(
+                FieldError("object", "password", "validation.password.required"),
+                FieldError("object", "password", "validation.password.tooShort"),
+                FieldError("object", "email", "validation.email.invalid"),
+            )
         `when`(ex.bindingResult).thenReturn(bindingResult)
-        `when`(bindingResult.fieldErrors).thenReturn(listOf(fieldError))
+        `when`(bindingResult.fieldErrors).thenReturn(errors)
 
         // when
-        val response = handler.handleValidationException(ex)
+        val problem = handler.handleValidationException(ex)
 
         // then
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertEquals("Validation failed", response.body!!.message)
-        assertNotNull(response.body!!.timestamp)
-        assertNotNull(response.body!!.errors)
-
-        val errors = response.body!!.errors
-        assertEquals(1, errors.size)
-        assertEquals(listOf("Username is required"), errors["username"])
+        assertEquals(HttpStatus.BAD_REQUEST.value(), problem.status)
+        assertEquals(GlobalExceptionHandler.VALIDATION_FAILED, problem.property(Problems.CODE_PROPERTY))
+        assertEquals(
+            mapOf(
+                "password" to listOf("validation.password.required", "validation.password.tooShort"),
+                "email" to listOf("validation.email.invalid"),
+            ),
+            problem.property(Problems.ERRORS_PROPERTY),
+        )
     }
 
     @Test
-    fun handleValidationException_ShouldHandleMultipleErrors() {
-        // given
-        val ex = mock(MethodArgumentNotValidException::class.java)
-        val bindingResult = mock(BindingResult::class.java)
-        val passwordError1 = FieldError("object", "password", "Password must be at least 8 characters")
-        val passwordError2 = FieldError("object", "password", "Password must contain an uppercase letter")
-        val emailError = FieldError("object", "email", "Invalid email format")
-
-        `when`(ex.bindingResult).thenReturn(bindingResult)
-        `when`(bindingResult.fieldErrors).thenReturn(listOf(passwordError1, passwordError2, emailError))
-
-        // when
-        val response = handler.handleValidationException(ex)
-
-        // then
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        val errors = response.body!!.errors
-        assertEquals(2, errors.size)
-        assertEquals(2, errors["password"]?.size)
-        assertEquals(1, errors["email"]?.size)
-        assertTrue(errors["password"]?.contains("Password must be at least 8 characters") == true)
-        assertTrue(errors["password"]?.contains("Password must contain an uppercase letter") == true)
-        assertEquals(listOf("Invalid email format"), errors["email"])
+    fun securityExceptions_ShouldMapToKeys() {
+        assertEquals(
+            GlobalExceptionHandler.INVALID_CREDENTIALS,
+            handler.handleBadCredentialsException().detail,
+        )
+        assertEquals(GlobalExceptionHandler.ACCOUNT_DISABLED, handler.handleDisabledException().detail)
+        assertEquals(GlobalExceptionHandler.ACCOUNT_LOCKED, handler.handleLockedException().detail)
+        assertEquals(
+            HttpStatus.FORBIDDEN.value(),
+            handler.handleAccessDeniedException().status,
+        )
     }
 
     @Test
-    fun handleBadCredentialsException_ShouldReturnUnauthorized() {
-        // given
-        val ex = BadCredentialsException("bad credentials")
-
+    fun handleException_ShouldPassFrameworkProblemsThrough() {
         // when
-        val response = handler.handleBadCredentialsException(ex)
+        val problem = handler.handleException(NoResourceFoundException(HttpMethod.GET, "/nope", "nope"))
 
         // then
-        assertEquals(HttpStatus.UNAUTHORIZED, response.statusCode)
-        assertEquals("Invalid email or password", response.body!!.message)
+        assertEquals(HttpStatus.NOT_FOUND.value(), problem.status)
     }
 
     @Test
-    fun handleDisabledException_ShouldReturnForbidden() {
-        // given
-        val ex = DisabledException("disabled")
-
+    fun handleException_ShouldHideUnexpectedErrors() {
         // when
-        val response = handler.handleDisabledException(ex)
+        val problem = handler.handleException(RuntimeException("secret detail"))
 
         // then
-        assertEquals(HttpStatus.FORBIDDEN, response.statusCode)
-        assertEquals("Account is disabled", response.body!!.message)
-    }
-
-    @Test
-    fun handleLockedException_ShouldReturnForbidden() {
-        // given
-        val ex = LockedException("locked")
-
-        // when
-        val response = handler.handleLockedException(ex)
-
-        // then
-        assertEquals(HttpStatus.FORBIDDEN, response.statusCode)
-        assertEquals("Account is locked", response.body!!.message)
-    }
-
-    @Test
-    fun handleException_ShouldReturnInternalServerError() {
-        // given
-        val ex = RuntimeException("unexpected error")
-
-        // when
-        val response = handler.handleException(ex)
-
-        // then
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode)
-        assertEquals("An unexpected error occurred", response.body!!.message)
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), problem.status)
+        assertEquals(GlobalExceptionHandler.UNEXPECTED, problem.detail)
     }
 }

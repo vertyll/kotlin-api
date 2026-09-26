@@ -174,7 +174,7 @@ class UserServiceTest {
                 userService.createUser(createDto)
             }
 
-        assertEquals("Email already exists", exception.message)
+        assertEquals("errors.user.emailTaken", exception.message)
         assertEquals(HttpStatus.BAD_REQUEST, exception.status)
         verify(userRepository).existsByEmail(testEmail)
         verify(roleService, never()).getOrCreateDefaultRole(anyString())
@@ -256,7 +256,7 @@ class UserServiceTest {
                 userService.updateUser(testUserId, updateDto)
             }
 
-        assertEquals("User not found", exception.message)
+        assertEquals("errors.user.notFound", exception.message)
         assertEquals(HttpStatus.NOT_FOUND, exception.status)
         verify(userRepository).findById(testUserId)
         verify(userRepository, never()).save(any())
@@ -306,7 +306,7 @@ class UserServiceTest {
                 userService.getUserById(testUserId)
             }
 
-        assertEquals("User not found", exception.message)
+        assertEquals("errors.user.notFound", exception.message)
         assertEquals(HttpStatus.NOT_FOUND, exception.status)
         verify(userRepository).findById(testUserId)
     }

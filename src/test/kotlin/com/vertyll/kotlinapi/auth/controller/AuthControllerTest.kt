@@ -9,7 +9,6 @@ import com.vertyll.kotlinapi.auth.service.AuthService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -20,7 +19,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
-import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
@@ -67,13 +65,10 @@ class AuthControllerTest {
             )
 
         // when
-        val response = authController.register(registerRequest)
+        authController.register(registerRequest)
 
         // then
         verify(authService).register(registerRequest)
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertNull(response.body?.data)
-        assertEquals("User registered successfully", response.body?.message)
     }
 
     @Test
@@ -96,9 +91,7 @@ class AuthControllerTest {
 
         // then
         verify(authService).authenticate(authRequest, response)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(authResponse, result.body?.data)
-        assertEquals("Authentication successful", result.body?.message)
+        assertEquals(authResponse, result)
     }
 
     @Test
@@ -116,33 +109,25 @@ class AuthControllerTest {
 
         // then
         verify(authService).refreshToken(request, response)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(authResponse, result.body?.data)
-        assertEquals("Token refreshed successfully", result.body?.message)
+        assertEquals(authResponse, result)
     }
 
     @Test
     fun `logout should call service and return success response`() {
         // when
-        val result = authController.logout(request, response)
+        authController.logout(request, response)
 
         // then
         verify(authService).logout(request, response)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertNull(result.body?.data)
-        assertEquals("Logged out successfully", result.body?.message)
     }
 
     @Test
     fun `logoutAll should call service and return success response`() {
         // when
-        val result = authController.logoutAll(request, response)
+        authController.logoutAll(request, response)
 
         // then
         verify(authService).logoutAllSessions(request, response)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertNull(result.body?.data)
-        assertEquals("Logged out from all sessions successfully", result.body?.message)
     }
 
     @Test
@@ -159,9 +144,7 @@ class AuthControllerTest {
 
         // then
         verify(authService).getUserActiveSessions(testEmail)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(sessions, result.body?.data)
-        assertEquals("Active sessions retrieved successfully", result.body?.message)
+        assertEquals(sessions, result)
     }
 
     @Test
@@ -170,13 +153,10 @@ class AuthControllerTest {
         val code = "123456"
 
         // when
-        val result = authController.verifyAccount(code)
+        authController.verifyAccount(code)
 
         // then
         verify(authService).verifyAccount(code)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertNull(result.body?.data)
-        assertEquals("Account verified successfully", result.body?.message)
     }
 
     @Test
@@ -189,13 +169,10 @@ class AuthControllerTest {
             )
 
         // when
-        val result = authController.requestEmailChange(changeEmailRequest)
+        authController.requestEmailChange(changeEmailRequest)
 
         // then
         verify(authService).requestEmailChange(changeEmailRequest)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertNull(result.body?.data)
-        assertEquals("Email change verification sent to new email", result.body?.message)
     }
 
     @Test
@@ -214,9 +191,7 @@ class AuthControllerTest {
 
         // then
         verify(authService).verifyEmailChange(code, response)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(authResponse, result.body?.data)
-        assertEquals("Email changed successfully", result.body?.message)
+        assertEquals(authResponse, result)
     }
 
     @Test
@@ -229,13 +204,10 @@ class AuthControllerTest {
             )
 
         // when
-        val result = authController.requestPasswordChange(changePasswordRequest)
+        authController.requestPasswordChange(changePasswordRequest)
 
         // then
         verify(authService).requestPasswordChange(changePasswordRequest)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertNull(result.body?.data)
-        assertEquals("Password change verification sent to email", result.body?.message)
     }
 
     @Test
@@ -244,12 +216,9 @@ class AuthControllerTest {
         val code = "123456"
 
         // when
-        val result = authController.verifyPasswordChange(code)
+        authController.verifyPasswordChange(code)
 
         // then
         verify(authService).verifyPasswordChange(code)
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertNull(result.body?.data)
-        assertEquals("Password changed successfully", result.body?.message)
     }
 }

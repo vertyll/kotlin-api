@@ -6,34 +6,23 @@ import org.springframework.http.HttpStatus
 
 class ApiExceptionTest {
     @Test
-    fun constructor_ShouldSetMessageAndStatus() {
-        // given
-        val message = "Test error message"
-        val status = HttpStatus.BAD_REQUEST
-
+    fun constructor_ShouldCarryKeyStatusAndArgs() {
         // when
-        val exception = ApiException(message, status)
+        val exception = ApiException("errors.role.notFound", HttpStatus.NOT_FOUND, mapOf("id" to 7))
 
         // then
-        assertEquals(message, exception.message)
-        assertEquals(status, exception.status)
-    }
-
-    @Test
-    fun getStatus_ShouldReturnCorrectStatus() {
-        // when
-        val exception = ApiException("message", HttpStatus.NOT_FOUND)
-
-        // then
+        assertEquals("errors.role.notFound", exception.messageKey)
+        assertEquals("errors.role.notFound", exception.message)
         assertEquals(HttpStatus.NOT_FOUND, exception.status)
+        assertEquals(mapOf("id" to 7), exception.args)
     }
 
     @Test
-    fun getMessage_ShouldReturnCorrectMessage() {
+    fun args_ShouldDefaultToEmpty() {
         // when
-        val exception = ApiException("test message", HttpStatus.BAD_REQUEST)
+        val exception = ApiException("errors.user.notFound", HttpStatus.NOT_FOUND)
 
         // then
-        assertEquals("test message", exception.message)
+        assertEquals(emptyMap<String, Any>(), exception.args)
     }
 }

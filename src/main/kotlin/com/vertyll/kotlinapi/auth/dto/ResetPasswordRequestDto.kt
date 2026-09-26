@@ -3,6 +3,6 @@ package com.vertyll.kotlinapi.auth.dto
 import jakarta.validation.constraints.NotBlank
 
 data class ResetPasswordRequestDto(
-    @field:NotBlank(message = "New password is required")
+    @field:NotBlank(message = "validation.newPassword.required")
     val newPassword: String = "",
 )

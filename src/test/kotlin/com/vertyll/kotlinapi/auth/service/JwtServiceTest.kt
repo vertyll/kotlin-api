@@ -1,5 +1,6 @@
 package com.vertyll.kotlinapi.auth.service
 
+import com.vertyll.kotlinapi.config.JwtProperties
 import io.jsonwebtoken.ExpiredJwtException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,27 +39,16 @@ class JwtServiceTest {
     @BeforeEach
     fun setUp() {
         fixedClock = Clock.fixed(Instant.parse("2025-01-01T00:00:00Z"), ZoneOffset.UTC)
-        jwtService = JwtService(fixedClock)
-
-        jwtService.apply {
-            this::class.java.getDeclaredField("secretKey").apply {
-                isAccessible = true
-                set(jwtService, secretKey)
-            }
-            this::class.java.getDeclaredField("accessTokenExpiration").apply {
-                isAccessible = true
-                set(jwtService, accessTokenExpiration.toLong())
-            }
-            this::class.java.getDeclaredField("refreshTokenExpiration").apply {
-                isAccessible = true
-                set(jwtService, refreshTokenExpiration.toLong())
-            }
-            this::class.java.getDeclaredField("refreshTokenCookieName").apply {
-                isAccessible = true
-                set(jwtService, refreshTokenCookieName)
-            }
-        }
+        jwtService = JwtService(properties(accessTokenExpiration.toLong()), fixedClock)
     }
+
+    private fun properties(accessExpiration: Long) =
+        JwtProperties(
+            secretKey = secretKey,
+            accessTokenExpiration = accessExpiration,
+            refreshTokenExpiration = refreshTokenExpiration.toLong(),
+            refreshTokenCookieName = refreshTokenCookieName,
+        )
 
     @Test
     fun `should generate valid access token and extract username`() {
@@ -91,15 +81,7 @@ class JwtServiceTest {
                 Instant.parse("2024-12-31T00:00:00Z"),
                 ZoneOffset.UTC,
             )
-        val expiredJwtService = JwtService(pastClock)
-        expiredJwtService::class.java.getDeclaredField("secretKey").apply {
-            isAccessible = true
-            set(expiredJwtService, secretKey)
-        }
-        expiredJwtService::class.java.getDeclaredField("accessTokenExpiration").apply {
-            isAccessible = true
-            set(expiredJwtService, 1000L)
-        }
+        val expiredJwtService = JwtService(properties(1000L), pastClock)
 
         val expiredToken = expiredJwtService.generateToken(mockUserDetails)
 

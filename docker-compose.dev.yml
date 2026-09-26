@@ -1,57 +1,29 @@
+name: kotlin-api
+
 services:
   db:
-    image: postgres:18-alpine
-    container_name: kotlin-api-postgre-sql
-    restart: always
+    image: docker.io/library/postgres:18-alpine
+    restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: kotlin_api
     volumes:
       - postgres-data:/var/lib/postgresql
-    networks:
-      - kotlin-api
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 10s
 
-  test-db:
-    container_name: kotlin-api-postgre-sql-test
-    image: postgres:18-alpine
-    restart: always
+  maildev:
+    image: docker.io/maildev/maildev:3.0.0
+    restart: unless-stopped
     ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: kotlin_api_test
-    networks:
-      - kotlin-api
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  mail-dev:
-    image: maildev/maildev:latest
-    container_name: kotlin-api-mail-dev
-    restart: always
-    ports:
-      - "1025:1025"
-      - "1080:1080"
-    networks:
-      - kotlin-api
-
-networks:
-  kotlin-api:
-    driver: bridge
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:1080:1080"
 
 volumes:
   postgres-data:

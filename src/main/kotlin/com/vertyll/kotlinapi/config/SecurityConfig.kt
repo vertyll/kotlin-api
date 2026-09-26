@@ -19,6 +19,7 @@ class SecurityConfig(
     private val jwtAuthFilter: JwtAuthenticationFilter,
     private val authenticationProvider: AuthenticationProvider,
     private val corsConfigurationSource: CorsConfigurationSource,
+    private val problemSecurityHandlers: ProblemSecurityHandlers,
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -36,12 +37,17 @@ class SecurityConfig(
                         "/auth/reset-password",
                         "/auth/logout",
                         "/auth/logout-all",
+                        "/translations/**",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                     ).permitAll()
                     .anyRequest()
                     .authenticated()
+            }.exceptionHandling {
+                it
+                    .authenticationEntryPoint(problemSecurityHandlers)
+                    .accessDeniedHandler(problemSecurityHandlers)
             }.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)

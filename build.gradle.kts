@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.thymeleaf.extras.springsecurity6)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
     implementation(libs.bundles.jjwt)
+    implementation(libs.icu4j)
     implementation(libs.spring.boot.starter.flyway) {
         exclude(group = "org.flywaydb", module = "flyway-core")
     }

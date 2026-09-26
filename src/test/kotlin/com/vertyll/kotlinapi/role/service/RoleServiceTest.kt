@@ -89,7 +89,7 @@ class RoleServiceTest {
                 roleService.createRole(createDto)
             }
 
-        assertEquals("Role already exists", exception.message)
+        assertEquals("errors.role.alreadyExists", exception.message)
         assertEquals(HttpStatus.BAD_REQUEST, exception.status)
         verify(roleRepository).existsByName(testRoleName)
         verify(roleRepository, never()).save(any())
@@ -158,7 +158,7 @@ class RoleServiceTest {
                 roleService.updateRole(testRoleId, updateDto)
             }
 
-        assertEquals("Role not found", exception.message)
+        assertEquals("errors.role.notFound", exception.message)
         assertEquals(HttpStatus.NOT_FOUND, exception.status)
         verify(roleRepository).findById(testRoleId)
         verify(roleRepository, never()).existsByName(anyString())
@@ -190,7 +190,7 @@ class RoleServiceTest {
                 roleService.updateRole(testRoleId, updateDto)
             }
 
-        assertEquals("Role with this name already exists", exception.message)
+        assertEquals("errors.role.alreadyExists", exception.message)
         assertEquals(HttpStatus.BAD_REQUEST, exception.status)
         verify(roleRepository).findById(testRoleId)
         verify(roleRepository).existsByName(updateDto.name)
@@ -326,7 +326,7 @@ class RoleServiceTest {
                 roleService.getRoleById(testRoleId)
             }
 
-        assertEquals("Role not found", exception.message)
+        assertEquals("errors.role.notFound", exception.message)
         assertEquals(HttpStatus.NOT_FOUND, exception.status)
         verify(roleRepository).findById(testRoleId)
     }

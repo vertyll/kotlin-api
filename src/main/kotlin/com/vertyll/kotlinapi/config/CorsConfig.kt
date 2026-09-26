@@ -1,20 +1,20 @@
 package com.vertyll.kotlinapi.config
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
-class CorsConfig {
-    @Value($$"${application.frontend.url}")
-    private lateinit var frontendUrl: String
-
+@Configuration
+class CorsConfig(
+    private val frontendProperties: FrontendProperties,
+) {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration =
             CorsConfiguration().apply {
-                allowedOrigins = listOf(frontendUrl)
+                allowedOrigins = listOf(frontendProperties.url)
                 allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 allowedHeaders = listOf("*")
                 allowCredentials = true

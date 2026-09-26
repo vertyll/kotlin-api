@@ -22,7 +22,7 @@ class UserService(
     @Transactional
     fun createUser(dto: UserCreateDto): UserResponseDto {
         if (userRepository.existsByEmail(dto.email)) {
-            throw ApiException("Email already exists", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.user.emailTaken", HttpStatus.BAD_REQUEST)
         }
 
         val roles = mutableSetOf<Role>()
@@ -56,7 +56,7 @@ class UserService(
         val user =
             userRepository
                 .findById(id)
-                .orElseThrow { ApiException("User not found", HttpStatus.NOT_FOUND) }
+                .orElseThrow { ApiException("errors.user.notFound", HttpStatus.NOT_FOUND) }
 
         dto.firstName.let { user.firstName = it }
         dto.lastName.let { user.lastName = it }
@@ -81,7 +81,7 @@ class UserService(
         val user =
             userRepository
                 .findById(id)
-                .orElseThrow { ApiException("User not found", HttpStatus.NOT_FOUND) }
+                .orElseThrow { ApiException("errors.user.notFound", HttpStatus.NOT_FOUND) }
         return mapToDto(user)
     }
 

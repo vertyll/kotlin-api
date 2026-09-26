@@ -17,7 +17,7 @@ class RoleService(
     @Transactional
     fun createRole(dto: RoleCreateDto): RoleResponseDto {
         if (roleRepository.existsByName(dto.name)) {
-            throw ApiException("Role already exists", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.role.alreadyExists", HttpStatus.BAD_REQUEST)
         }
 
         val role =
@@ -38,10 +38,10 @@ class RoleService(
         val role =
             roleRepository
                 .findById(id)
-                .orElseThrow { ApiException("Role not found", HttpStatus.NOT_FOUND) }
+                .orElseThrow { ApiException("errors.role.notFound", HttpStatus.NOT_FOUND) }
 
         if (roleRepository.existsByName(dto.name) && role.name != dto.name) {
-            throw ApiException("Role with this name already exists", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.role.alreadyExists", HttpStatus.BAD_REQUEST)
         }
 
         // Create a copy with updated values since Role is a data class
@@ -71,7 +71,7 @@ class RoleService(
         val role =
             roleRepository
                 .findById(id)
-                .orElseThrow { ApiException("Role not found", HttpStatus.NOT_FOUND) }
+                .orElseThrow { ApiException("errors.role.notFound", HttpStatus.NOT_FOUND) }
         return mapToDto(role)
     }
 

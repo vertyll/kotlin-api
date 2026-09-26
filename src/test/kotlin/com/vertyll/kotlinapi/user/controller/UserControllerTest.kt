@@ -12,7 +12,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.http.HttpStatus
 
 @ExtendWith(MockitoExtension::class)
 class UserControllerTest {
@@ -52,9 +51,7 @@ class UserControllerTest {
 
         // then
         verify(userService).createUser(userCreateDto)
-        assertEquals(HttpStatus.CREATED, response.statusCode)
-        assertEquals(userResponseDto, response.body?.data)
-        assertEquals("User created successfully", response.body?.message)
+        assertEquals(userResponseDto, response)
     }
 
     @Test
@@ -84,9 +81,7 @@ class UserControllerTest {
 
         // then
         verify(userService).updateUser(id, userUpdateDto)
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(userResponseDto, response.body?.data)
-        assertEquals("User updated successfully", response.body?.message)
+        assertEquals(userResponseDto, response)
     }
 
     @Test
@@ -109,8 +104,6 @@ class UserControllerTest {
 
         // then
         verify(userService).getUserById(id)
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(userResponseDto, response.body?.data)
-        assertEquals("User retrieved successfully", response.body?.message)
+        assertEquals(userResponseDto, response)
     }
 }

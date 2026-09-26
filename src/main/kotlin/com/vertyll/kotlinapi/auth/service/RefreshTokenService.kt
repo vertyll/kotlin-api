@@ -57,7 +57,7 @@ class RefreshTokenService(
 
         val refreshToken =
             allTokens.find { passwordEncoder.matches(token, it.token) }
-                ?: throw ApiException("Invalid refresh token", HttpStatus.UNAUTHORIZED)
+                ?: throw ApiException("errors.auth.invalidRefreshToken", HttpStatus.UNAUTHORIZED)
 
         return refreshToken.user
     }
@@ -78,7 +78,7 @@ class RefreshTokenService(
 
         val refreshToken =
             allTokens.find { passwordEncoder.matches(oldToken, it.token) }
-                ?: throw ApiException("Invalid refresh token", HttpStatus.UNAUTHORIZED)
+                ?: throw ApiException("errors.auth.invalidRefreshToken", HttpStatus.UNAUTHORIZED)
 
         refreshToken.revoked = true
         refreshTokenRepository.save(refreshToken)

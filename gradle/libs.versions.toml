@@ -10,6 +10,7 @@ jjwt = "0.13.0"
 flyway = "13.8.0"
 mockito-kotlin = "6.4.0"
 testcontainers = "2.0.5"
+icu4j = "78.3"
 
 [libraries]
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
@@ -29,6 +30,7 @@ jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
 flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 postgresql = { module = "org.postgresql:postgresql" }
+icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
 spring-boot-starter-security-test = { module = "org.springframework.boot:spring-boot-starter-security-test" }
 spring-boot-starter-thymeleaf-test = { module = "org.springframework.boot:spring-boot-starter-thymeleaf-test" }

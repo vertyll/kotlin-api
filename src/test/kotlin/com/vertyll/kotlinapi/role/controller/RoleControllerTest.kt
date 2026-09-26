@@ -15,7 +15,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.http.HttpStatus
 
 @ExtendWith(MockitoExtension::class)
 class RoleControllerTest {
@@ -49,9 +48,7 @@ class RoleControllerTest {
 
         // then
         verify(roleService).createRole(roleCreateDto)
-        assertEquals(HttpStatus.CREATED, response.statusCode)
-        assertEquals(roleResponseDto, response.body?.data)
-        assertEquals("Role created successfully", response.body?.message)
+        assertEquals(roleResponseDto, response)
     }
 
     @Test
@@ -76,9 +73,7 @@ class RoleControllerTest {
 
         // then
         verify(roleService).updateRole(id, roleUpdateDto)
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(roleResponseDto, response.body?.data)
-        assertEquals("Role updated successfully", response.body?.message)
+        assertEquals(roleResponseDto, response)
     }
 
     @Test
@@ -98,9 +93,7 @@ class RoleControllerTest {
 
         // then
         verify(roleService).getRoleById(id)
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(roleResponseDto, response.body?.data)
-        assertEquals("Role retrieved successfully", response.body?.message)
+        assertEquals(roleResponseDto, response)
     }
 
     @Test
@@ -109,12 +102,10 @@ class RoleControllerTest {
         val response = roleController.getAllRoleTypes()
 
         // then
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(RoleType.entries, response.body?.data)
-        assertEquals("Role types retrieved successfully", response.body?.message)
+        assertEquals(RoleType.entries, response)
 
         // Verify all expected role types are present
-        val roleTypes = response.body?.data
+        val roleTypes = response
         assertNotNull(roleTypes)
         assertTrue(roleTypes!!.contains(RoleType.ADMIN))
         assertTrue(roleTypes.contains(RoleType.USER))

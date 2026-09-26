@@ -43,10 +43,10 @@ class AuthService(
 ) {
     private companion object {
         private const val ERROR_PASSWORD_ENCODING_FAILED = "Password encoding failed"
-        private const val ERROR_USER_NOT_FOUND = "User not found"
-        private const val ERROR_VERIFICATION_CODE_ALREADY_USED = "Verification code already used"
-        private const val ERROR_VERIFICATION_CODE_EXPIRED = "Verification code expired"
-        private const val ERROR_INVALID_VERIFICATION_CODE_TYPE = "Invalid verification code type"
+        private const val ERROR_USER_NOT_FOUND = "errors.user.notFound"
+        private const val ERROR_VERIFICATION_CODE_ALREADY_USED = "errors.verification.used"
+        private const val ERROR_VERIFICATION_CODE_EXPIRED = "errors.verification.expired"
+        private const val ERROR_INVALID_VERIFICATION_CODE_TYPE = "errors.verification.invalidType"
         private const val VERIFICATION_CODE_MIN = 100000
         private const val VERIFICATION_CODE_RANGE = 900000
         private const val VERIFICATION_TOKEN_EXPIRY_HOURS = 24L
@@ -59,7 +59,7 @@ class AuthService(
     @Throws(MessagingException::class)
     fun register(request: RegisterRequestDto) {
         if (userRepository.existsByEmail(request.email)) {
-            throw ApiException("Email already registered", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.user.emailTaken", HttpStatus.BAD_REQUEST)
         }
 
         val user =
@@ -107,7 +107,7 @@ class AuthService(
                 .orElseThrow { ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND) }
 
         if (!user.isEnabled) {
-            throw ApiException("Account not verified", HttpStatus.FORBIDDEN)
+            throw ApiException("errors.auth.accountNotVerified", HttpStatus.FORBIDDEN)
         }
 
         val jwtToken = jwtService.generateToken(user)
@@ -131,7 +131,7 @@ class AuthService(
     ): AuthResponseDto {
         val refreshToken =
             extractRefreshTokenFromCookies(request)
-                ?: throw ApiException("Refresh token not found", HttpStatus.UNAUTHORIZED)
+                ?: throw ApiException("errors.auth.refreshTokenMissing", HttpStatus.UNAUTHORIZED)
 
         val user = refreshTokenService.validateRefreshToken(refreshToken)
 
@@ -178,7 +178,7 @@ class AuthService(
             // Clear the refresh token cookie
             deleteRefreshTokenCookie(response)
         } else {
-            throw ApiException("Refresh token not found", HttpStatus.UNAUTHORIZED)
+            throw ApiException("errors.auth.refreshTokenMissing", HttpStatus.UNAUTHORIZED)
         }
     }
 
@@ -287,11 +287,11 @@ class AuthService(
                 .orElseThrow { ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND) }
 
         if (!passwordEncoder.matches(request.currentPassword, user.password)) {
-            throw ApiException("Invalid current password", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.auth.invalidCurrentPassword", HttpStatus.BAD_REQUEST)
         }
 
         if (userRepository.existsByEmail(request.newEmail)) {
-            throw ApiException("Email already in use", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.user.emailTaken", HttpStatus.BAD_REQUEST)
         }
 
         val verificationCode = generateVerificationCode()
@@ -332,7 +332,8 @@ class AuthService(
         }
 
         val user = verificationToken.user ?: throw ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND)
-        val newEmail = verificationToken.additionalData ?: throw ApiException("New email not found", HttpStatus.BAD_REQUEST)
+        val newEmail =
+            verificationToken.additionalData ?: throw ApiException("errors.verification.pendingEmailMissing", HttpStatus.BAD_REQUEST)
 
         val updatedUser = createUpdatedUser(user, email = newEmail)
         updatedUser.id = user.id
@@ -367,7 +368,7 @@ class AuthService(
                 .orElseThrow { ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND) }
 
         if (!passwordEncoder.matches(request.currentPassword, user.password)) {
-            throw ApiException("Invalid current password", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.auth.invalidCurrentPassword", HttpStatus.BAD_REQUEST)
         }
 
         val verificationCode = generateVerificationCode()
@@ -405,7 +406,8 @@ class AuthService(
         }
 
         val user = verificationToken.user ?: throw ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND)
-        val newPasswordHash = verificationToken.additionalData ?: throw ApiException("New password not found", HttpStatus.BAD_REQUEST)
+        val newPasswordHash =
+            verificationToken.additionalData ?: throw ApiException("errors.verification.pendingPasswordMissing", HttpStatus.BAD_REQUEST)
 
         val updatedUser = createUpdatedUser(user, password = newPasswordHash)
 
@@ -450,15 +452,15 @@ class AuthService(
         val verificationToken = getVerificationTokenByCode(token)
 
         if (verificationToken.used) {
-            throw ApiException("Verification token already used", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.verification.used", HttpStatus.BAD_REQUEST)
         }
 
         if (verificationToken.expiryDate.isBefore(LocalDateTime.now())) {
-            throw ApiException("Verification token expired", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.verification.expired", HttpStatus.BAD_REQUEST)
         }
 
         if (verificationToken.tokenType != VerificationTokenType.PASSWORD_RESET) {
-            throw ApiException("Invalid verification token type", HttpStatus.BAD_REQUEST)
+            throw ApiException("errors.verification.invalidType", HttpStatus.BAD_REQUEST)
         }
 
         val user = verificationToken.user ?: throw ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND)
@@ -486,7 +488,7 @@ class AuthService(
     private fun getVerificationTokenByCode(code: String): VerificationToken =
         tokenRepository
             .findByToken(code)
-            .orElseThrow { ApiException("Invalid verification code", HttpStatus.BAD_REQUEST) }
+            .orElseThrow { ApiException("errors.verification.invalid", HttpStatus.BAD_REQUEST) }
 
     /**
      * Gets the current authentication from the security context.
@@ -495,7 +497,7 @@ class AuthService(
      */
     private fun getCurrentAuthentication(): Authentication =
         SecurityContextHolder.getContext().authentication
-            ?: throw ApiException("Unauthorized", HttpStatus.UNAUTHORIZED)
+            ?: throw ApiException("errors.auth.authenticationRequired", HttpStatus.UNAUTHORIZED)
 
     /**
      * Creates an updated user instance while preserving the original ID.

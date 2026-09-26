@@ -3,6 +3,7 @@ package com.vertyll.kotlinapi.common.exception
 import org.springframework.http.HttpStatus
 
 class ApiException(
-    message: String,
+    val messageKey: String,
     val status: HttpStatus,
-) : RuntimeException(message)
+    val args: Map<String, Any> = emptyMap(),
+) : RuntimeException(messageKey)

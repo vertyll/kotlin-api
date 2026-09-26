@@ -21,6 +21,7 @@ Showcase Kotlin and Spring Boot API.
 - Spring Mail.
 - Flyway.
 - OpenAPI (Swagger).
+- ICU4J.
 
 ### Authentication:
 
@@ -30,7 +31,13 @@ and includes token refresh mechanism (http only secure cookie).
 
 ### Core back-end:
 
-- The application has exception handling mechanism.
+- Endpoints return plain data; every error is an RFC 9457 document (`application/problem+json`) whose `code`
+  names a message key, with ICU arguments in `args` and rejected fields in `errors` (a validation problem keys
+  `args` by field too).
+- Messages live in an ICU MessageFormat catalogue: defaults ship in `src/main/resources/i18n/{pl,en}.json` and are
+  synchronized into the database at startup. Clients fetch `GET /api/v1/translations/{pl|en}`; an admin lists,
+  overrides and resets messages under `/api/v1/admin/translations` (an override must parse and may use only the
+  arguments of its default).
 - The application has logging mechanism.
 - The application has email sending mechanism.
 - The application has scheduled task handling mechanism (cron).
@@ -44,4 +51,5 @@ and includes token refresh mechanism (http only secure cookie).
 
 - Detekt for static code analysis.
 - ktlint for static code analysis and maintaining consistent code quality.
-- Docker for development environment.
+- Docker for development environment (`docker compose -f docker-compose.dev.yml up -d`: PostgreSQL and maildev);
+  tests start their own PostgreSQL with Testcontainers.
