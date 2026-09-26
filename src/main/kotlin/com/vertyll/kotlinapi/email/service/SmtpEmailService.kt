@@ -30,11 +30,11 @@ class SmtpEmailService(
     override fun sendEmail(
         to: String,
         username: String,
-        emailTemplate: EmailTemplateName?,
+        emailTemplate: EmailTemplateName,
         activationCode: String,
         subject: String,
     ) {
-        val templateName = emailTemplate?.name ?: "confirm-email"
+        val templateName = emailTemplate.name
 
         val mimeMessage: MimeMessage = mailSender.createMimeMessage()
         val helper =

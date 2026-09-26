@@ -86,22 +86,4 @@ class SmtpEmailServiceTest {
         // Verify send was called with our mock MimeMessage
         verify(mailSender).send(mimeMessage)
     }
-
-    @Test
-    fun `sendEmail should handle null email template`() {
-        // given
-        val to = "recipient@example.com"
-        val username = "Test User"
-        val emailTemplate = null
-        val activationCode = "123456"
-        val subject = "Test Subject"
-
-        // when
-        emailService.sendEmail(to, username, emailTemplate, activationCode, subject)
-
-        // then
-        // Verify process was called with fallback template name
-        verify(templateEngine).process(templateNameCaptor.capture(), any(Context::class.java))
-        assert(templateNameCaptor.value == "confirm-email")
-    }
 }
