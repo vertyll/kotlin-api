@@ -24,8 +24,8 @@ Showcase Kotlin and Spring Boot API.
 
 ### Authentication:
 
-- JWT-based authentication – the application uses JWT tokens for user authentication and includes token refresh 
-mechanism (http only secure cookie).
+- JWT-based authentication – the application uses JWT tokens for user authentication
+and includes token refresh mechanism (http only secure cookie).
 - The application allows logging in on multiple devices simultaneously.
 
 ### Core back-end:
@@ -45,8 +45,3 @@ mechanism (http only secure cookie).
 - Detekt for static code analysis.
 - ktlint for static code analysis and maintaining consistent code quality.
 - Docker for development environment.
-
-> [!NOTE]
->
-> During application development, SOLID principles, DRY, composition over inheritance, dependency injection, design 
-> patterns, architectural patterns were applied, tests were written, and other good programming practices were adopted.
