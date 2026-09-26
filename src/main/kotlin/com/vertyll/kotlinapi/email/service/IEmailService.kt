@@ -14,7 +14,7 @@ fun interface IEmailService {
      *
      * @param to The email address of the recipient
      * @param username The username or name of the recipient
-     * @param emailTemplate The template to use for the email content, can be null
+     * @param emailTemplate The template to use for the email content
      * @param activationCode The activation code to include in the email
      * @param subject The subject line of the email
      * @throws MessagingException If there's an error sending the email
@@ -23,7 +23,7 @@ fun interface IEmailService {
     fun sendEmail(
         to: String,
         username: String,
-        emailTemplate: EmailTemplateName?,
+        emailTemplate: EmailTemplateName,
         activationCode: String,
         subject: String,
     )
