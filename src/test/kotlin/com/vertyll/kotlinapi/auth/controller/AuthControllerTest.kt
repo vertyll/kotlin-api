@@ -57,7 +57,6 @@ class AuthControllerTest {
 
     @Test
     fun `register should call service and return success response`() {
-        // given
         val registerRequest =
             RegisterRequestDto(
                 firstName = "Test",
@@ -66,16 +65,13 @@ class AuthControllerTest {
                 password = "password123",
             )
 
-        // when
         authController.register(registerRequest)
 
-        // then
         verify(authService).register(registerRequest)
     }
 
     @Test
     fun `authenticate should call service and return auth response`() {
-        // given
         val authRequest =
             AuthRequestDto(
                 email = testEmail,
@@ -88,17 +84,14 @@ class AuthControllerTest {
             )
         `when`(authService.authenticate(authRequest, response)).thenReturn(authResponse)
 
-        // when
         val result = authController.authenticate(authRequest, response)
 
-        // then
         verify(authService).authenticate(authRequest, response)
         assertEquals(authResponse, result)
     }
 
     @Test
     fun `refreshToken should call service and return auth response`() {
-        // given
         val authResponse =
             AuthResponseDto(
                 token = "new-test-token",
@@ -106,80 +99,64 @@ class AuthControllerTest {
             )
         `when`(authService.refreshToken(request, response)).thenReturn(authResponse)
 
-        // when
         val result = authController.refreshToken(request, response)
 
-        // then
         verify(authService).refreshToken(request, response)
         assertEquals(authResponse, result)
     }
 
     @Test
     fun `logout should call service and return success response`() {
-        // when
         authController.logout(request, response)
 
-        // then
         verify(authService).logout(request, response)
     }
 
     @Test
     fun `logoutAll should call service and return success response`() {
-        // when
         authController.logoutAll(request, response)
 
-        // then
         verify(authService).logoutAllSessions(request, response)
     }
 
     @Test
     fun `getSessions should get current user email and call service`() {
-        // given
         val sessions =
             listOf(
                 SessionResponseDto(id = 1L, deviceInfo = "Device 1", createdAt = LocalDateTime.of(2023, 1, 1, 0, 0)),
             )
         `when`(authService.getUserActiveSessions(testEmail)).thenReturn(sessions)
 
-        // when
         val result = authController.getSessions()
 
-        // then
         verify(authService).getUserActiveSessions(testEmail)
         assertEquals(sessions, result)
     }
 
     @Test
     fun `verifyAccount should call service and return success response`() {
-        // given
         val code = "123456"
 
-        // when
         authController.verifyAccount(code)
 
-        // then
         verify(authService).verifyAccount(code)
     }
 
     @Test
     fun `requestEmailChange should call service and return success response`() {
-        // given
         val changeEmailRequest =
             ChangeEmailRequestDto(
                 currentPassword = "password123",
                 newEmail = "new-email@example.com",
             )
 
-        // when
         authController.requestEmailChange(changeEmailRequest)
 
-        // then
         verify(authService).requestEmailChange(changeEmailRequest)
     }
 
     @Test
     fun `verifyEmailChange should call service and return auth response`() {
-        // given
         val code = "123456"
         val authResponse =
             AuthResponseDto(
@@ -188,39 +165,31 @@ class AuthControllerTest {
             )
         `when`(authService.verifyEmailChange(code, response)).thenReturn(authResponse)
 
-        // when
         val result = authController.verifyEmailChange(code, response)
 
-        // then
         verify(authService).verifyEmailChange(code, response)
         assertEquals(authResponse, result)
     }
 
     @Test
     fun `requestPasswordChange should call service and return success response`() {
-        // given
         val changePasswordRequest =
             ChangePasswordRequestDto(
                 currentPassword = "password123",
                 newPassword = "newpassword123",
             )
 
-        // when
         authController.requestPasswordChange(changePasswordRequest)
 
-        // then
         verify(authService).requestPasswordChange(changePasswordRequest)
     }
 
     @Test
     fun `verifyPasswordChange should call service and return success response`() {
-        // given
         val code = "123456"
 
-        // when
         authController.verifyPasswordChange(code)
 
-        // then
         verify(authService).verifyPasswordChange(code)
     }
 }

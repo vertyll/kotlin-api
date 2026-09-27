@@ -50,7 +50,6 @@ class User(
     override fun isEnabled(): Boolean = enabled
 
     companion object {
-        // Factory method to replace the builder pattern
         fun create(
             firstName: String,
             lastName: String,

@@ -44,7 +44,6 @@ class RoleService(
             throw ApiException("errors.role.alreadyExists", HttpStatus.BAD_REQUEST)
         }
 
-        // Create a copy with updated values since Role is a data class
         val updatedRole =
             role.copy(
                 name = dto.name,

@@ -21,12 +21,10 @@ class UserControllerTest {
     @InjectMocks
     private lateinit var userController: UserController
 
-    // Use different IDs for different tests to avoid potential issues with test independence
     private val testId = (100..999).random().toLong()
 
     @Test
     fun `createUser should call service and return created user`() {
-        // given
         val userCreateDto =
             UserCreateDto(
                 firstName = "Test",
@@ -46,17 +44,14 @@ class UserControllerTest {
             )
         `when`(userService.createUser(userCreateDto)).thenReturn(userResponseDto)
 
-        // when
         val response = userController.createUser(userCreateDto)
 
-        // then
         verify(userService).createUser(userCreateDto)
         assertEquals(userResponseDto, response)
     }
 
     @Test
     fun `updateUser should call service and return updated user`() {
-        // given
         val id = testId
         val userUpdateDto =
             UserUpdateDto(
@@ -76,17 +71,14 @@ class UserControllerTest {
             )
         `when`(userService.updateUser(id, userUpdateDto)).thenReturn(userResponseDto)
 
-        // when
         val response = userController.updateUser(id, userUpdateDto)
 
-        // then
         verify(userService).updateUser(id, userUpdateDto)
         assertEquals(userResponseDto, response)
     }
 
     @Test
     fun `getUser should call service and return user`() {
-        // given
         val id = testId
         val userResponseDto =
             UserResponseDto(
@@ -99,10 +91,8 @@ class UserControllerTest {
             )
         `when`(userService.getUserById(id)).thenReturn(userResponseDto)
 
-        // when
         val response = userController.getUser(id)
 
-        // then
         verify(userService).getUserById(id)
         assertEquals(userResponseDto, response)
     }

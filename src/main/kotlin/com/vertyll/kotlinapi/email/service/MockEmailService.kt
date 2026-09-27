@@ -5,11 +5,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
-/**
- * Mock implementation of the IEmailService interface for testing purposes.
- * This implementation logs email details instead of actually sending emails.
- * It's useful for development and testing environments.
- */
 @Service
 @Profile("test")
 class MockEmailService : IEmailService {

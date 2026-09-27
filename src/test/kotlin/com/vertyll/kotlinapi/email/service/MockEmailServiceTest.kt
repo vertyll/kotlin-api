@@ -19,7 +19,6 @@ class MockEmailServiceTest {
     fun setUp() {
         mockEmailService = MockEmailService()
 
-        // Set up logger to capture log messages
         logger = LoggerFactory.getLogger(MockEmailService::class.java) as Logger
         listAppender = ListAppender()
         listAppender.start()
@@ -33,20 +32,16 @@ class MockEmailServiceTest {
 
     @Test
     fun `sendEmail should log all email details`() {
-        // given
         val to = "test@example.com"
         val username = "Test User"
         val emailTemplate = EmailTemplateName.ACTIVATE_ACCOUNT
         val activationCode = "123456"
         val subject = "Test Subject"
 
-        // when
         mockEmailService.sendEmail(to, username, emailTemplate, activationCode, subject)
 
-        // then
         val logsList = listAppender.list
 
-        // Verify all expected log messages are present
         assertTrue(logsList.any { it.message.contains("MOCK EMAIL SERVICE") })
         assertTrue(logsList.any { it.message.contains("To: $to") })
         assertTrue(logsList.any { it.message.contains("Username: $username") })

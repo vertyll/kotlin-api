@@ -24,12 +24,10 @@ class RoleControllerTest {
     @InjectMocks
     private lateinit var roleController: RoleController
 
-    // Use different IDs for different tests to avoid potential issues with test independence
     private val testId = (100..999).random().toLong()
 
     @Test
     fun `createRole should call service and return created role`() {
-        // given
         val roleCreateDto =
             RoleCreateDto(
                 name = "TEST_ROLE",
@@ -43,17 +41,14 @@ class RoleControllerTest {
             )
         `when`(roleService.createRole(roleCreateDto)).thenReturn(roleResponseDto)
 
-        // when
         val response = roleController.createRole(roleCreateDto)
 
-        // then
         verify(roleService).createRole(roleCreateDto)
         assertEquals(roleResponseDto, response)
     }
 
     @Test
     fun `updateRole should call service and return updated role`() {
-        // given
         val id = testId
         val roleUpdateDto =
             RoleUpdateDto(
@@ -68,17 +63,14 @@ class RoleControllerTest {
             )
         `when`(roleService.updateRole(id, roleUpdateDto)).thenReturn(roleResponseDto)
 
-        // when
         val response = roleController.updateRole(id, roleUpdateDto)
 
-        // then
         verify(roleService).updateRole(id, roleUpdateDto)
         assertEquals(roleResponseDto, response)
     }
 
     @Test
     fun `getRole should call service and return role`() {
-        // given
         val id = testId
         val roleResponseDto =
             RoleResponseDto(
@@ -88,23 +80,18 @@ class RoleControllerTest {
             )
         `when`(roleService.getRoleById(id)).thenReturn(roleResponseDto)
 
-        // when
         val response = roleController.getRole(id)
 
-        // then
         verify(roleService).getRoleById(id)
         assertEquals(roleResponseDto, response)
     }
 
     @Test
     fun `getAllRoleTypes should return all role types`() {
-        // when
         val response = roleController.getAllRoleTypes()
 
-        // then
         assertEquals(RoleType.entries, response)
 
-        // Verify all expected role types are present
         val roleTypes = response
         assertNotNull(roleTypes)
         assertTrue(roleTypes!!.contains(RoleType.ADMIN))

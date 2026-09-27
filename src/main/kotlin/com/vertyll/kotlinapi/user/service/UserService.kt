@@ -71,7 +71,6 @@ class UserService(
                     roles = user.roles,
                     enabled = user.isEnabled,
                 )
-            // Copy ID and other BaseEntity properties
             updatedUser.id = user.id
             return mapToDto(userRepository.save(updatedUser))
         }

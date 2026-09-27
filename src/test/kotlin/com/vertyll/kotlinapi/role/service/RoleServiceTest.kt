@@ -29,14 +29,12 @@ class RoleServiceTest {
     @InjectMocks
     private lateinit var roleService: RoleService
 
-    // Use different IDs for different tests to avoid potential issues with test independence
     private val testRoleId = (100..999).random().toLong()
     private val testRoleName = "TEST_ROLE"
     private val testRoleDescription = "Test role description"
 
     @Test
     fun `createRole should create and return a new role when name is unique`() {
-        // given
         val createDto =
             RoleCreateDto(
                 name = testRoleName,
@@ -48,16 +46,13 @@ class RoleServiceTest {
                 name = testRoleName,
                 description = testRoleDescription,
             )
-        // Set ID field using reflection since it's in the BaseEntity class
         setRoleId(savedRole, testRoleId)
 
         `when`(roleRepository.existsByName(testRoleName)).thenReturn(false)
         `when`(roleRepository.save(any())).thenReturn(savedRole)
 
-        // when
         val result = roleService.createRole(createDto)
 
-        // then
         verify(roleRepository).existsByName(testRoleName)
 
         val roleCaptor = ArgumentCaptor.forClass(Role::class.java)
@@ -74,7 +69,6 @@ class RoleServiceTest {
 
     @Test
     fun `createRole should throw exception when role with same name already exists`() {
-        // given
         val createDto =
             RoleCreateDto(
                 name = testRoleName,
@@ -83,7 +77,6 @@ class RoleServiceTest {
 
         `when`(roleRepository.existsByName(testRoleName)).thenReturn(true)
 
-        // when/then
         val exception =
             assertThrows(ApiException::class.java) {
                 roleService.createRole(createDto)
@@ -97,7 +90,6 @@ class RoleServiceTest {
 
     @Test
     fun `updateRole should update and return the role when it exists and name is unique`() {
-        // given
         val existingRole =
             Role(
                 name = testRoleName,
@@ -122,10 +114,8 @@ class RoleServiceTest {
         `when`(roleRepository.existsByName(updateDto.name)).thenReturn(false)
         `when`(roleRepository.save(any())).thenReturn(updatedRole)
 
-        // when
         val result = roleService.updateRole(testRoleId, updateDto)
 
-        // then
         verify(roleRepository).findById(testRoleId)
         verify(roleRepository).existsByName(updateDto.name)
 
@@ -143,7 +133,6 @@ class RoleServiceTest {
 
     @Test
     fun `updateRole should throw exception when role does not exist`() {
-        // given
         val updateDto =
             RoleUpdateDto(
                 name = "UPDATED_ROLE",
@@ -152,7 +141,6 @@ class RoleServiceTest {
 
         `when`(roleRepository.findById(testRoleId)).thenReturn(Optional.empty())
 
-        // when/then
         val exception =
             assertThrows(ApiException::class.java) {
                 roleService.updateRole(testRoleId, updateDto)
@@ -167,7 +155,6 @@ class RoleServiceTest {
 
     @Test
     fun `updateRole should throw exception when new name already exists for another role`() {
-        // given
         val existingRole =
             Role(
                 name = testRoleName,
@@ -184,7 +171,6 @@ class RoleServiceTest {
         `when`(roleRepository.findById(testRoleId)).thenReturn(Optional.of(existingRole))
         `when`(roleRepository.existsByName(updateDto.name)).thenReturn(true)
 
-        // when/then
         val exception =
             assertThrows(ApiException::class.java) {
                 roleService.updateRole(testRoleId, updateDto)
@@ -199,7 +185,6 @@ class RoleServiceTest {
 
     @Test
     fun `updateRole should allow updating to the same name`() {
-        // given
         val existingRole =
             Role(
                 name = testRoleName,
@@ -224,10 +209,8 @@ class RoleServiceTest {
         `when`(roleRepository.existsByName(updateDto.name)).thenReturn(true) // Name exists but it's the same role
         `when`(roleRepository.save(any())).thenReturn(updatedRole)
 
-        // when
         val result = roleService.updateRole(testRoleId, updateDto)
 
-        // then
         verify(roleRepository).findById(testRoleId)
         verify(roleRepository).existsByName(updateDto.name)
 
@@ -241,7 +224,6 @@ class RoleServiceTest {
 
     @Test
     fun `getOrCreateDefaultRole should return existing role when it exists`() {
-        // given
         val existingRole =
             Role(
                 name = testRoleName,
@@ -251,10 +233,8 @@ class RoleServiceTest {
 
         `when`(roleRepository.findByName(testRoleName)).thenReturn(Optional.of(existingRole))
 
-        // when
         val result = roleService.getOrCreateDefaultRole(testRoleName)
 
-        // then
         verify(roleRepository).findByName(testRoleName)
         verify(roleRepository, never()).save(any())
 
@@ -264,7 +244,6 @@ class RoleServiceTest {
 
     @Test
     fun `getOrCreateDefaultRole should create and return new role when it does not exist`() {
-        // given
         val newRole =
             Role(
                 name = testRoleName,
@@ -275,10 +254,8 @@ class RoleServiceTest {
         `when`(roleRepository.findByName(testRoleName)).thenReturn(Optional.empty())
         `when`(roleRepository.save(any())).thenReturn(newRole)
 
-        // when
         val result = roleService.getOrCreateDefaultRole(testRoleName)
 
-        // then
         verify(roleRepository).findByName(testRoleName)
 
         val roleCaptor = ArgumentCaptor.forClass(Role::class.java)
@@ -294,7 +271,6 @@ class RoleServiceTest {
 
     @Test
     fun `getRoleById should return role when it exists`() {
-        // given
         val existingRole =
             Role(
                 name = testRoleName,
@@ -304,10 +280,8 @@ class RoleServiceTest {
 
         `when`(roleRepository.findById(testRoleId)).thenReturn(Optional.of(existingRole))
 
-        // when
         val result = roleService.getRoleById(testRoleId)
 
-        // then
         verify(roleRepository).findById(testRoleId)
 
         assertEquals(testRoleId, result.id)
@@ -317,10 +291,8 @@ class RoleServiceTest {
 
     @Test
     fun `getRoleById should throw exception when role does not exist`() {
-        // given
         `when`(roleRepository.findById(testRoleId)).thenReturn(Optional.empty())
 
-        // when/then
         val exception =
             assertThrows(ApiException::class.java) {
                 roleService.getRoleById(testRoleId)
@@ -331,7 +303,6 @@ class RoleServiceTest {
         verify(roleRepository).findById(testRoleId)
     }
 
-    // Helper method to set the ID field of a Role using reflection
     private fun setRoleId(
         role: Role,
         id: Long,

@@ -16,7 +16,6 @@ class ApplicationConfig(
 ) {
     @Bean
     fun authenticationProvider(): AuthenticationProvider {
-        // Use constructor with UserDetailsService and wire PasswordEncoder via setter
         val provider = DaoAuthenticationProvider(userDetailsService)
         provider.setPasswordEncoder(passwordEncoder())
         return provider

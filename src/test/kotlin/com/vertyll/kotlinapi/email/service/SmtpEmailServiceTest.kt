@@ -45,45 +45,34 @@ class SmtpEmailServiceTest {
 
     @BeforeEach
     fun setUp() {
-        // Mock mailProperties to return a valid 'from' email
         `when`(mailProperties.from).thenReturn("sender@example.com")
 
-        // Mock the createMimeMessage method to return our mock MimeMessage
         `when`(mailSender.createMimeMessage()).thenReturn(mimeMessage)
 
-        // Mock the process method to return a template
         `when`(templateEngine.process(anyString(), any(Context::class.java))).thenReturn("<html>Test Template</html>")
     }
 
     @Test
     fun `sendEmail should send email with correct parameters`() {
-        // given
         val to = "recipient@example.com"
         val username = "Test User"
         val emailTemplate = EmailTemplateName.ACTIVATE_ACCOUNT
         val activationCode = "123456"
         val subject = "Test Subject"
 
-        // when
         emailService.sendEmail(to, username, emailTemplate, activationCode, subject)
 
-        // then
-        // Verify createMimeMessage was called
         verify(mailSender).createMimeMessage()
 
-        // Verify process was called with correct template name and context
         verify(templateEngine).process(templateNameCaptor.capture(), contextCaptor.capture())
 
-        // Verify template name
         assert(templateNameCaptor.value == emailTemplate.name)
 
-        // Verify context variables
         val capturedContext = contextCaptor.value
         val variables = ReflectionTestUtils.getField(capturedContext, "variables") as Map<*, *>
         assert(variables["username"] == username)
         assert(variables["activation_code"] == activationCode)
 
-        // Verify send was called with our mock MimeMessage
         verify(mailSender).send(mimeMessage)
     }
 }

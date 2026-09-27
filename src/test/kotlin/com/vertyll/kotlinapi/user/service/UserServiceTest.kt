@@ -39,7 +39,6 @@ class UserServiceTest {
     @InjectMocks
     private lateinit var userService: UserService
 
-    // Use different IDs for different tests to avoid potential issues with test independence
     private val testUserId = (100..999).random().toLong()
     private val testRoleId = (100..999).random().toLong()
     private val testFirstName = "Test"
@@ -51,7 +50,6 @@ class UserServiceTest {
 
     @Test
     fun `createUser should create and return a new user when email is unique`() {
-        // given
         val createDto =
             UserCreateDto(
                 firstName = testFirstName,
@@ -80,10 +78,8 @@ class UserServiceTest {
         `when`(passwordEncoder.encode(testPassword)).thenReturn(testEncodedPassword)
         `when`(userRepository.save(any())).thenReturn(savedUser)
 
-        // when
         val result = userService.createUser(createDto)
 
-        // then
         verify(userRepository).existsByEmail(testEmail)
         verify(roleService).getOrCreateDefaultRole(testRoleName)
         verify(passwordEncoder).encode(testPassword)
@@ -109,14 +105,12 @@ class UserServiceTest {
 
     @Test
     fun `createUser should use default USER role when no roles specified`() {
-        // given
         val createDto =
             UserCreateDto(
                 firstName = testFirstName,
                 lastName = testLastName,
                 email = testEmail,
                 password = testPassword,
-                // No roles specified
             )
 
         val testRole = Role(name = "USER")
@@ -138,10 +132,8 @@ class UserServiceTest {
         `when`(passwordEncoder.encode(testPassword)).thenReturn(testEncodedPassword)
         `when`(userRepository.save(any())).thenReturn(savedUser)
 
-        // when
         val result = userService.createUser(createDto)
 
-        // then
         verify(userRepository).existsByEmail(testEmail)
         verify(roleService).getOrCreateDefaultRole("USER")
         verify(passwordEncoder).encode(testPassword)
@@ -157,7 +149,6 @@ class UserServiceTest {
 
     @Test
     fun `createUser should throw exception when email already exists`() {
-        // given
         val createDto =
             UserCreateDto(
                 firstName = testFirstName,
@@ -168,7 +159,6 @@ class UserServiceTest {
 
         `when`(userRepository.existsByEmail(testEmail)).thenReturn(true)
 
-        // when/then
         val exception =
             assertThrows(ApiException::class.java) {
                 userService.createUser(createDto)
@@ -184,7 +174,6 @@ class UserServiceTest {
 
     @Test
     fun `updateUser should update and return the user when it exists`() {
-        // given
         val existingUser =
             User(
                 firstName = testFirstName,
@@ -217,10 +206,8 @@ class UserServiceTest {
         `when`(userRepository.findById(testUserId)).thenReturn(Optional.of(existingUser))
         `when`(userRepository.save(any())).thenReturn(updatedUser)
 
-        // when
         val result = userService.updateUser(testUserId, updateDto)
 
-        // then
         verify(userRepository).findById(testUserId)
 
         val userCaptor = ArgumentCaptor.forClass(User::class.java)
@@ -240,7 +227,6 @@ class UserServiceTest {
 
     @Test
     fun `updateUser should throw exception when user does not exist`() {
-        // given
         val updateDto =
             UserUpdateDto(
                 firstName = "Updated",
@@ -250,7 +236,6 @@ class UserServiceTest {
 
         `when`(userRepository.findById(testUserId)).thenReturn(Optional.empty())
 
-        // when/then
         val exception =
             assertThrows(ApiException::class.java) {
                 userService.updateUser(testUserId, updateDto)
@@ -264,7 +249,6 @@ class UserServiceTest {
 
     @Test
     fun `getUserById should return user when it exists`() {
-        // given
         val testRole = Role(name = testRoleName)
         setRoleId(testRole, testRoleId)
 
@@ -281,10 +265,8 @@ class UserServiceTest {
 
         `when`(userRepository.findById(testUserId)).thenReturn(Optional.of(existingUser))
 
-        // when
         val result = userService.getUserById(testUserId)
 
-        // then
         verify(userRepository).findById(testUserId)
 
         assertEquals(testUserId, result.id)
@@ -297,10 +279,8 @@ class UserServiceTest {
 
     @Test
     fun `getUserById should throw exception when user does not exist`() {
-        // given
         `when`(userRepository.findById(testUserId)).thenReturn(Optional.empty())
 
-        // when/then
         val exception =
             assertThrows(ApiException::class.java) {
                 userService.getUserById(testUserId)
@@ -311,7 +291,6 @@ class UserServiceTest {
         verify(userRepository).findById(testUserId)
     }
 
-    // Helper method to set the ID field of a Role using reflection
     private fun setRoleId(
         role: Role,
         id: Long,
@@ -321,7 +300,6 @@ class UserServiceTest {
         field.set(role, id)
     }
 
-    // Helper method to set the ID field of a User using reflection
     private fun setUserId(
         user: User,
         id: Long,

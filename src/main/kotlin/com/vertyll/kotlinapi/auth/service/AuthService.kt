@@ -113,7 +113,6 @@ class AuthService(
 
         val jwtToken = jwtService.generateToken(user)
 
-        // Create refresh token and set as HTTP-only cookie if response is provided
         response?.let {
             val refreshToken = refreshTokenService.createRefreshToken(user, request.deviceInfo)
             addRefreshTokenCookie(it, refreshToken)
@@ -140,7 +139,6 @@ class AuthService(
 
         val newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken)
 
-        // Set new refresh token as cookie
         addRefreshTokenCookie(response, newRefreshToken)
 
         return AuthResponseDto(
@@ -160,7 +158,6 @@ class AuthService(
             refreshTokenService.revokeRefreshToken(it)
         }
 
-        // Clear the refresh token cookie
         deleteRefreshTokenCookie(response)
     }
 
@@ -176,7 +173,6 @@ class AuthService(
 
             refreshTokenService.revokeAllUserTokens(user)
 
-            // Clear the refresh token cookie
             deleteRefreshTokenCookie(response)
         } else {
             throw ApiException("errors.auth.refreshTokenMissing", HttpStatus.UNAUTHORIZED)
@@ -478,36 +474,15 @@ class AuthService(
         refreshTokenService.revokeAllUserTokens(user)
     }
 
-    /**
-     * Gets a verification token by its code.
-     * Throws an ApiException if the token is not found.
-     *
-     * @param code The verification code
-     * @return The verification token
-     * @throws ApiException If the verification code is invalid
-     */
     private fun getVerificationTokenByCode(code: String): VerificationToken =
         tokenRepository
             .findByToken(code)
             .orElseThrow { ApiException("errors.verification.invalid", HttpStatus.BAD_REQUEST) }
 
-    /**
-     * Gets the current authentication from the security context.
-     *
-     * @return The current authentication
-     */
     private fun getCurrentAuthentication(): Authentication =
         SecurityContextHolder.getContext().authentication
             ?: throw ApiException("errors.auth.authenticationRequired", HttpStatus.UNAUTHORIZED)
 
-    /**
-     * Creates an updated user instance while preserving the original ID.
-     *
-     * @param user The original user
-     * @param email Optional new email (defaults to original user's username)
-     * @param password Optional new password (defaults to original user's password)
-     * @return A new User instance with updated fields but same ID
-     */
     private fun createUpdatedUser(
         user: User,
         email: String = user.username,

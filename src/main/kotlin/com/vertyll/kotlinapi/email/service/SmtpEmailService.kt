@@ -13,11 +13,6 @@ import org.thymeleaf.context.Context
 import org.thymeleaf.spring6.SpringTemplateEngine
 import java.nio.charset.StandardCharsets
 
-/**
- * SMTP implementation of the IEmailService interface.
- * This implementation uses JavaMailSender to send emails via SMTP
- * and Thymeleaf for template processing.
- */
 @Service
 @Profile("!test")
 class SmtpEmailService(

@@ -1,9 +1,5 @@
 package com.vertyll.kotlinapi.auth.enums
 
-/**
- * Enum representing different types of verification tokens.
- * Used to distinguish between different verification processes.
- */
 enum class VerificationTokenType {
     ACCOUNT_ACTIVATION,
     EMAIL_CHANGE,

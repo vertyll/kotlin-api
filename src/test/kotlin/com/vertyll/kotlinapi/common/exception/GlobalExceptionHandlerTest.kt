@@ -26,13 +26,10 @@ class GlobalExceptionHandlerTest {
 
     @Test
     fun handleApiException_ShouldReturnProblemWithKeyAndArgs() {
-        // given
         val ex = ApiException("errors.role.notFound", HttpStatus.NOT_FOUND, mapOf("id" to 7))
 
-        // when
         val problem = handler.handleApiException(ex)
 
-        // then
         assertEquals(HttpStatus.NOT_FOUND.value(), problem.status)
         assertEquals("errors.role.notFound", problem.detail)
         assertEquals("errors.role.notFound", problem.property(Problems.CODE_PROPERTY))
@@ -41,16 +38,13 @@ class GlobalExceptionHandlerTest {
 
     @Test
     fun handleApiException_ShouldOmitEmptyArgs() {
-        // when
         val problem = handler.handleApiException(ApiException("errors.user.notFound", HttpStatus.NOT_FOUND))
 
-        // then
         assertNull(problem.property(Problems.ARGS_PROPERTY))
     }
 
     @Test
     fun handleValidationException_ShouldGroupKeysByField() {
-        // given
         val ex = mock(MethodArgumentNotValidException::class.java)
         val bindingResult = mock(BindingResult::class.java)
         val errors =
@@ -62,10 +56,8 @@ class GlobalExceptionHandlerTest {
         `when`(ex.bindingResult).thenReturn(bindingResult)
         `when`(bindingResult.fieldErrors).thenReturn(errors)
 
-        // when
         val problem = handler.handleValidationException(ex)
 
-        // then
         assertEquals(HttpStatus.BAD_REQUEST.value(), problem.status)
         assertEquals(GlobalExceptionHandler.VALIDATION_FAILED, problem.property(Problems.CODE_PROPERTY))
         assertEquals(
@@ -93,19 +85,15 @@ class GlobalExceptionHandlerTest {
 
     @Test
     fun handleException_ShouldPassFrameworkProblemsThrough() {
-        // when
         val problem = handler.handleException(NoResourceFoundException(HttpMethod.GET, "/nope", "nope"))
 
-        // then
         assertEquals(HttpStatus.NOT_FOUND.value(), problem.status)
     }
 
     @Test
     fun handleException_ShouldHideUnexpectedErrors() {
-        // when
         val problem = handler.handleException(RuntimeException("secret detail"))
 
-        // then
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), problem.status)
         assertEquals(GlobalExceptionHandler.UNEXPECTED, problem.detail)
     }

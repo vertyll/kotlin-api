@@ -18,10 +18,6 @@ class RefreshTokenService(
     private val jwtService: JwtService,
     private val passwordEncoder: PasswordEncoder,
 ) {
-    /**
-     * Creates a new refresh token for the given user
-     * The token is hashed before storing in the database for security
-     */
     @Transactional
     fun createRefreshToken(
         user: User,
@@ -45,9 +41,6 @@ class RefreshTokenService(
         return tokenValue
     }
 
-    /**
-     * Validates a refresh token and returns the associated user if valid
-     */
     @Transactional(readOnly = true)
     fun validateRefreshToken(token: String): User {
         val allTokens =
@@ -62,10 +55,6 @@ class RefreshTokenService(
         return refreshToken.user
     }
 
-    /**
-     * Rotates a refresh token - revokes the old one and creates a new one
-     * This is a security best practice to limit the lifetime of refresh tokens
-     */
     @Transactional
     fun rotateRefreshToken(
         oldToken: String,
@@ -86,9 +75,6 @@ class RefreshTokenService(
         return createRefreshToken(refreshToken.user, deviceInfo)
     }
 
-    /**
-     * Revokes a specific refresh token
-     */
     @Transactional
     fun revokeRefreshToken(token: String) {
         val allTokens =
@@ -104,27 +90,17 @@ class RefreshTokenService(
         refreshTokenRepository.save(refreshToken)
     }
 
-    /**
-     * Revokes all refresh tokens for a user
-     */
     @Transactional
     fun revokeAllUserTokens(user: User) {
         refreshTokenRepository.revokeAllUserTokens(user)
     }
 
-    /**
-     * Gets all active sessions for a user
-     */
     @Transactional(readOnly = true)
     fun getUserActiveSessions(user: User): List<RefreshToken> =
         refreshTokenRepository
             .findByUserAndRevoked(user, false)
             .filter { it.expiryDate.isAfter(Instant.now()) }
 
-    /**
-     * Scheduled task to delete expired tokens
-     * Runs daily at midnight
-     */
     @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     fun cleanupExpiredTokens() {
