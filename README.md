@@ -51,5 +51,5 @@ and includes token refresh mechanism (http only secure cookie).
 
 - Detekt for static code analysis.
 - ktlint for static code analysis and maintaining consistent code quality.
-- Docker for development environment (`docker compose -f docker-compose.dev.yml up -d`: PostgreSQL and maildev);
+- Docker for development environment (`docker compose -f docker-compose.local.yml up -d`: PostgreSQL and maildev);
   tests start their own PostgreSQL with Testcontainers.
