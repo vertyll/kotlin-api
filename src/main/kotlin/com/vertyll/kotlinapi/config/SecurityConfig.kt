@@ -35,6 +35,7 @@ class SecurityConfig(
                         "/auth/reset-password",
                         "/auth/logout",
                         "/auth/logout-all",
+                        "/actuator/health/**",
                         "/translations/**",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
