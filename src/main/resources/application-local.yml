@@ -10,7 +10,7 @@ spring:
       quiet-period: 1s
       exclude: static/**,public/**
     livereload:
-      enabled: true
+      enabled: false
 
   datasource:
     url: jdbc:postgresql://localhost:5432/kotlin_api
