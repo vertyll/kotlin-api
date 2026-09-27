@@ -5,7 +5,7 @@ spring:
   devtools:
     restart:
       enabled: true
-      additional-paths: src/main/java,src/main/resources
+      additional-paths: src/main/kotlin,src/main/resources
       poll-interval: 2s
       quiet-period: 1s
       exclude: static/**,public/**
