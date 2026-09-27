@@ -23,10 +23,6 @@ spring:
           starttls:
             enable: false
 
-  task:
-    scheduling:
-      enabled: false
-
 security:
   jwt:
     secret-key: isN5Z1EinzeD2JyjXq6SZqoBd+QpOJMxZsBHwfhXHAA=
