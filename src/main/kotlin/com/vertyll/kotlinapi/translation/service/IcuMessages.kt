@@ -9,9 +9,12 @@ import com.ibm.icu.text.MessagePattern
  */
 object IcuMessages {
     fun isValid(message: String): Boolean =
-        runCatching { MessageFormat(message) }
-            .map { true }
-            .getOrElse { if (it is IllegalArgumentException) false else throw it }
+        try {
+            MessageFormat(message)
+            true
+        } catch (ignored: IllegalArgumentException) {
+            false
+        }
 
     fun placeholders(message: String): Set<String> {
         val pattern = MessagePattern(message)
