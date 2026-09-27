@@ -86,7 +86,7 @@ class UserService(
 
     private fun mapToDto(user: User): UserResponseDto =
         UserResponseDto(
-            id = user.id ?: 0L,
+            id = checkNotNull(user.id),
             firstName = user.firstName,
             lastName = user.lastName,
             email = user.username,

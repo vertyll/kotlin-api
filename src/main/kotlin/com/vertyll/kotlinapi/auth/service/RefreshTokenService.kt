@@ -84,7 +84,7 @@ class RefreshTokenService(
 
         val refreshToken =
             allTokens.find { passwordEncoder.matches(token, it.token) }
-                ?: return // Token not found or already revoked, nothing to do
+                ?: return
 
         refreshToken.revoked = true
         refreshTokenRepository.save(refreshToken)

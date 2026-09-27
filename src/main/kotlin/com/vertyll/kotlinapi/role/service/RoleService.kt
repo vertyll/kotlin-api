@@ -76,7 +76,7 @@ class RoleService(
 
     private fun mapToDto(role: Role): RoleResponseDto =
         RoleResponseDto(
-            id = role.id ?: 0L,
+            id = checkNotNull(role.id),
             name = role.name,
             description = role.description,
         )

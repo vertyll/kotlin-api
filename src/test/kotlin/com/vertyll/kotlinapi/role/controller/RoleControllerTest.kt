@@ -94,7 +94,7 @@ class RoleControllerTest {
 
         val roleTypes = response
         assertNotNull(roleTypes)
-        assertTrue(roleTypes!!.contains(RoleType.ADMIN))
+        assertTrue(roleTypes.contains(RoleType.ADMIN))
         assertTrue(roleTypes.contains(RoleType.USER))
         assertTrue(roleTypes.contains(RoleType.MANAGER))
         assertTrue(roleTypes.contains(RoleType.EMPLOYEE))

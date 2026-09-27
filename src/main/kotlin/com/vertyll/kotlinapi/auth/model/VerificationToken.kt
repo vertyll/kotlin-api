@@ -20,7 +20,7 @@ class VerificationToken(
     var token: String = "",
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: User? = null,
+    var user: User,
     @Column(nullable = false)
     var expiryDate: LocalDateTime = LocalDateTime.now(),
     @Column(nullable = false)

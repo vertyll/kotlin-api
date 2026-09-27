@@ -93,7 +93,7 @@ class AuthService(
     @Transactional
     fun authenticate(
         request: AuthRequestDto,
-        response: HttpServletResponse? = null,
+        response: HttpServletResponse,
     ): AuthResponseDto {
         authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(
@@ -113,10 +113,8 @@ class AuthService(
 
         val jwtToken = jwtService.generateToken(user)
 
-        response?.let {
-            val refreshToken = refreshTokenService.createRefreshToken(user, request.deviceInfo)
-            addRefreshTokenCookie(it, refreshToken)
-        }
+        val refreshToken = refreshTokenService.createRefreshToken(user, request.deviceInfo)
+        addRefreshTokenCookie(response, refreshToken)
 
         return AuthResponseDto(
             token = jwtToken,
@@ -213,7 +211,7 @@ class AuthService(
             throw ApiException(ERROR_INVALID_VERIFICATION_CODE_TYPE, HttpStatus.BAD_REQUEST)
         }
 
-        val user = verificationToken.user ?: throw ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND)
+        val user = verificationToken.user
         user.enabled = true
         verificationToken.used = true
 
@@ -328,7 +326,7 @@ class AuthService(
             throw ApiException(ERROR_INVALID_VERIFICATION_CODE_TYPE, HttpStatus.BAD_REQUEST)
         }
 
-        val user = verificationToken.user ?: throw ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND)
+        val user = verificationToken.user
         val newEmail =
             verificationToken.additionalData ?: throw ApiException("errors.verification.pendingEmailMissing", HttpStatus.BAD_REQUEST)
 
@@ -402,7 +400,7 @@ class AuthService(
             throw ApiException(ERROR_INVALID_VERIFICATION_CODE_TYPE, HttpStatus.BAD_REQUEST)
         }
 
-        val user = verificationToken.user ?: throw ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND)
+        val user = verificationToken.user
         val newPasswordHash =
             verificationToken.additionalData ?: throw ApiException("errors.verification.pendingPasswordMissing", HttpStatus.BAD_REQUEST)
 
@@ -460,7 +458,7 @@ class AuthService(
             throw ApiException("errors.verification.invalidType", HttpStatus.BAD_REQUEST)
         }
 
-        val user = verificationToken.user ?: throw ApiException(ERROR_USER_NOT_FOUND, HttpStatus.NOT_FOUND)
+        val user = verificationToken.user
 
         val newPasswordHash = requireNotNull(passwordEncoder.encode(request.newPassword)) { ERROR_PASSWORD_ENCODING_FAILED }
 
