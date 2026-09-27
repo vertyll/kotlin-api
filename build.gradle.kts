@@ -82,8 +82,15 @@ ktlint {
     }
 }
 
+val mockitoAgent: Configuration by configurations.creating
+
+dependencies {
+    mockitoAgent(libs.mockito.core) { isTransitive = false }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs("-javaagent:${mockitoAgent.asPath}", "-Xshare:off")
 
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 }
