@@ -227,7 +227,7 @@ class AuthService(
     private fun createVerificationToken(
         user: User,
         token: String,
-        tokenType: VerificationTokenType = VerificationTokenType.ACCOUNT_ACTIVATION,
+        tokenType: VerificationTokenType,
         additionalData: String? = null,
     ) {
         val verificationToken =
