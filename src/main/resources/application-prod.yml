@@ -26,7 +26,6 @@ spring:
     port: ${MAIL_PORT}
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
-    from: ${MAIL_FROM}
     properties:
       mail:
         smtp:
@@ -54,6 +53,8 @@ security:
     refresh-token-cookie-name: "refresh_token"
 
 application:
+  mail:
+    from: ${MAIL_FROM}
   file:
     uploads:
       file-output-path: ${FILE_UPLOAD_PATH:/var/app/uploads}

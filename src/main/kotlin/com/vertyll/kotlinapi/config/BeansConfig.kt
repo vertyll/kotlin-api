@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import java.time.Clock
 
 @Configuration
-@EnableConfigurationProperties(JwtProperties::class, FrontendProperties::class)
+@EnableConfigurationProperties(JwtProperties::class, FrontendProperties::class, MailProperties::class)
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 @EnableScheduling
 class BeansConfig {

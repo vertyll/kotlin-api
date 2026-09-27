@@ -33,7 +33,6 @@ spring:
     port: 1025
     username: vertyll
     password: vertyll
-    from: no-reply@kotlinapi.local
     properties:
       mail:
         smtp:
@@ -59,6 +58,8 @@ security:
     refresh-token-cookie-name: refresh_token
 
 application:
+  mail:
+    from: no-reply@kotlinapi.local
   file:
     uploads:
       file-output-path: ./uploads

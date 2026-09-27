@@ -16,7 +16,6 @@ spring:
     port: 3025
     username: test
     password: test
-    from: no-reply@kotlinapi.local
     properties:
       mail:
         smtp:
@@ -36,6 +35,8 @@ security:
     refresh-token-cookie-name: refresh_token
 
 application:
+  mail:
+    from: no-reply@kotlinapi.local
   file:
     uploads:
       file-output-path: ./test-uploads
