@@ -8,21 +8,21 @@
     <title>Account Activation</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #121212; color: #e8e8e8; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6;">
-<table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #121212;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; border-collapse: collapse; background-color: #121212;">
     <tr>
-        <td style="padding: 40px 16px;">
-            <table role="presentation" style="width: 100%; border-collapse: collapse; max-width: 560px; margin: 0 auto;">
+        <td align="center" bgcolor="#121212" style="padding: 40px 16px;">
+            <table role="presentation" width="560" align="center" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 560px; border-collapse: collapse;">
                 <tr>
                     <td style="padding: 0 0 16px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #a0a0a0;">Kotlin API</td>
                 </tr>
                 <tr>
-                    <td style="background-color: #1a1a1a; border: 1px solid #303030; padding: 32px;">
+                    <td bgcolor="#1a1a1a" style="background-color: #1a1a1a; border: 1px solid #303030; padding: 32px; overflow-wrap: anywhere;">
                         <h1 style="margin: 0 0 20px; font-size: 22px; font-weight: 600; line-height: 1.3; color: #e8e8e8;">Account Activation</h1>
                         <p style="margin: 0 0 16px; font-size: 15px; color: #e8e8e8;" th:text="'Hello ' + ${username} + ','">Hello,</p>
                         <p style="margin: 0 0 16px; font-size: 15px; color: #e8e8e8;">Thank you for registering. To complete your registration, enter the following verification code:</p>
-                        <table role="presentation" style="width: 100%; border-collapse: collapse; margin: 8px 0 24px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; border-collapse: collapse; margin: 8px 0 24px;">
                             <tr>
-                                <td style="background-color: #121212; border: 1px solid #303030; padding: 16px; text-align: center; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 26px; font-weight: 600; letter-spacing: 6px; color: #e8e8e8;" th:text="${activation_code}">000000</td>
+                                <td bgcolor="#121212" style="background-color: #121212; border: 1px solid #303030; padding: 16px; text-align: center; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 26px; font-weight: 600; letter-spacing: 6px; color: #e8e8e8;" th:text="${activation_code}">000000</td>
                             </tr>
                         </table>
                         <p style="margin: 24px 0 0; padding-top: 16px; border-top: 1px solid #303030; font-size: 13px; color: #a0a0a0;">This code will expire in 24 hours. If you did not register for an account, ignore this email.</p>
