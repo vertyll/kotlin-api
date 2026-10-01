@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.sonarqube)
+    jacoco
 }
 
 group = "com.vertyll"
@@ -93,6 +95,33 @@ tasks.withType<Test> {
     )
 
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+}
+
+jacoco {
+    toolVersion = libs.versions.jacoco.get()
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "kotlin-api")
+        property("sonar.projectName", "kotlin-api")
+        property("sonar.issue.ignore.multicriteria", "emailTables,emailAttributes,localSecrets,uploadLimitsYaml")
+        property("sonar.issue.ignore.multicriteria.emailTables.ruleKey", "Web:S5257")
+        property("sonar.issue.ignore.multicriteria.emailTables.resourceKey", "**/templates/**/*.html")
+        property("sonar.issue.ignore.multicriteria.emailAttributes.ruleKey", "Web:S1827")
+        property("sonar.issue.ignore.multicriteria.emailAttributes.resourceKey", "**/templates/**/*.html")
+        property("sonar.issue.ignore.multicriteria.localSecrets.ruleKey", "java:S6437")
+        property("sonar.issue.ignore.multicriteria.localSecrets.resourceKey", "**/application-local.*")
+        property("sonar.issue.ignore.multicriteria.uploadLimitsYaml.ruleKey", "java:S5693")
+        property("sonar.issue.ignore.multicriteria.uploadLimitsYaml.resourceKey", "**/application*.yml")
+    }
 }
 
 tasks.bootJar {
