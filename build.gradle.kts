@@ -108,6 +108,10 @@ tasks.jacocoTestReport {
     }
 }
 
+tasks.named("sonar") {
+    dependsOn(tasks.jacocoTestReport)
+}
+
 sonar {
     properties {
         property("sonar.projectKey", "kotlin-api")
