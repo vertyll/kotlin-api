@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
@@ -123,6 +124,16 @@ class HostedSignInTest {
         assertThat(browser.send(mvc.post().uri("/auth/logout"))).hasStatus(HttpStatus.NO_CONTENT)
         verify(tokenClient).revoke(REFRESH_TOKEN)
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT)
+    }
+
+    @Test
+    fun `logout sent from another site leaves the session`() {
+        val browser = signedIn(session(Instant.now().plusSeconds(LIFETIME_SECONDS)))
+
+        assertThat(browser.send(mvc.post().uri("/auth/logout").header("Sec-Fetch-Site", "same-site")))
+            .hasStatus(HttpStatus.FORBIDDEN)
+        verify(tokenClient, never()).revoke(REFRESH_TOKEN)
+        assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.OK)
     }
 
     private fun stateIssuedTo(browser: Browser): String =

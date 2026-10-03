@@ -17,6 +17,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
+          issuer-uri: ${application.keycloak.realm-url}
           audiences:
             - kotlin-api
   mail:
@@ -59,5 +60,4 @@ springdoc:
 
 application:
   keycloak:
-    realm: kotlin-api
     client-id: kotlin-api

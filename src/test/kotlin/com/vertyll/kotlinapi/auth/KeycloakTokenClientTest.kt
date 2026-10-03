@@ -25,7 +25,7 @@ class KeycloakTokenClientTest {
     private val keycloak = MockRestServiceServer.bindTo(builder).build()
     private val client =
         KeycloakTokenClient(
-            KeycloakProperties("http://keycloak.test", "kotlin-api", "kotlin-api", "secret"),
+            KeycloakProperties("http://keycloak.test/realms/kotlin-api", "kotlin-api", "secret"),
             AuthProperties("http://app.test/auth/callback", "http://app.test/"),
             { token ->
                 Jwt

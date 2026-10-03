@@ -24,11 +24,6 @@ spring:
           starttls:
             enable: true
             required: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${KEYCLOAK_REALM_URL}
 
 application:
   mail:
@@ -36,7 +31,7 @@ application:
   frontend:
     url: ${FRONTEND_URL}
   keycloak:
-    server-url: ${KEYCLOAK_SERVER_URL}
+    realm-url: ${KEYCLOAK_REALM_URL}
     client-secret: ${KEYCLOAK_CLIENT_SECRET}
   auth:
     callback-url: ${AUTH_CALLBACK_URL}

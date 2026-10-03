@@ -6,6 +6,7 @@ kotlin = "2.4.10"
 spring-boot = "4.1.1"
 spring-dependency-management = "1.1.7"
 ktlint-gradle = "14.2.0"
+ktlint-engine = "1.8.0"
 detekt = "2.0.0-alpha.6"
 springdoc = "3.1.1"
 flyway = "13.8.0"
@@ -14,6 +15,7 @@ testcontainers = "2.0.5"
 icu4j = "78.3"
 
 [libraries]
+netty-resolver-dns-native-macos = { module = "io.netty:netty-resolver-dns-native-macos" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }

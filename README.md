@@ -35,7 +35,7 @@ Showcase Kotlin and Spring Boot API.
   `GET /api/v1/auth/session` says who is signed in and `POST /api/v1/auth/logout` ends the session here and at Keycloak.
 - A request with a session gets its access token attached on the server, refreshed when it is about to expire;
   refresh tokens rotate on every use and concurrent requests share a single refresh. A cross-site write is not given
-  the token.
+  the token, and a cross-site logout is refused.
 - The API is a stateless OAuth2 resource server: it verifies the token's signature, issuer, expiry and audience
   (`kotlin-api`) and takes the realm roles (`USER`, `ADMIN`) from it. A client with its own Keycloak token calls it
   with `Authorization: Bearer`.

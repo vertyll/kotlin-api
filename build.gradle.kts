@@ -10,6 +10,8 @@ plugins {
     jacoco
 }
 
+val kotlinVersion = libs.versions.kotlin.get()
+
 group = "com.vertyll"
 version = "0.0.1-SNAPSHOT"
 description = "Showcase Kotlin and Spring Boot API"
@@ -35,6 +37,10 @@ dependencies {
     implementation(libs.spring.boot.starter.security)
     implementation(libs.spring.boot.starter.security.oauth2.resource.server)
     implementation(libs.spring.boot.starter.session.data.redis)
+    if (System.getProperty("os.name").startsWith("Mac")) {
+        val arch = if (System.getProperty("os.arch") == "aarch64") "osx-aarch_64" else "osx-x86_64"
+        runtimeOnly(variantOf(libs.netty.resolver.dns.native.macos) { classifier(arch) })
+    }
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
@@ -70,7 +76,19 @@ detekt {
     buildUponDefaultConfig = true
 }
 
+configurations.matching { it.name.startsWith("ktlint") }.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            useVersion(kotlinVersion)
+        }
+    }
+}
+
 ktlint {
+    version.set(
+        libs.versions.ktlint.engine
+            .get(),
+    )
     verbose.set(true)
     outputToConsole.set(true)
     coloredOutput.set(true)

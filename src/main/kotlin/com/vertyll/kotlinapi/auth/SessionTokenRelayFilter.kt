@@ -23,7 +23,7 @@ class SessionTokenRelayFilter(
     override fun shouldNotFilter(request: HttpServletRequest): Boolean =
         request.requestURI.startsWith(request.contextPath + AUTH_PATH) ||
             request.getHeader(HttpHeaders.AUTHORIZATION) != null ||
-            !sentBySameOrigin(request)
+            !FetchMetadata.sentFromThisOrigin(request)
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -51,9 +51,6 @@ class SessionTokenRelayFilter(
         }
     }
 
-    private fun sentBySameOrigin(request: HttpServletRequest): Boolean =
-        request.method in SAFE_METHODS || request.getHeader(FETCH_SITE_HEADER).let { it == null || it in TRUSTED_FETCH_SITES }
-
     private class BearerRequest(
         request: HttpServletRequest,
         accessToken: String,
@@ -74,9 +71,6 @@ class SessionTokenRelayFilter(
     private companion object {
         private const val AUTH_PATH = "/auth/"
         private const val BEARER_PREFIX = "Bearer "
-        private const val FETCH_SITE_HEADER = "Sec-Fetch-Site"
         private val REFRESH_SKEW = Duration.ofSeconds(30)
-        private val SAFE_METHODS = setOf("GET", "HEAD", "OPTIONS")
-        private val TRUSTED_FETCH_SITES = setOf("same-origin", "none")
     }
 }

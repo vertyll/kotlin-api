@@ -78,11 +78,15 @@ class AuthController(
                 log.debug("Keycloak returned an authorization error: {}", error)
                 redirectToApp(SIGN_IN_FAILED)
             }
+
             code == null || state == null || transaction == null || !Pkce.sameState(transaction.state, state) -> {
                 log.warn("Rejecting a sign-in callback whose state was not issued to this browser")
                 redirectToApp(STATE_MISMATCH)
             }
-            else -> completeSignIn(request, code, transaction)
+
+            else -> {
+                completeSignIn(request, code, transaction)
+            }
         }
     }
 
@@ -95,6 +99,9 @@ class AuthController(
     @PostMapping("/logout")
     @Operation(summary = "End the session here and at Keycloak")
     fun logout(request: HttpServletRequest): ResponseEntity<Void> {
+        if (!FetchMetadata.sentFromThisOrigin(request)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
         browserSessions.current(request)?.let(sessions::signOut)
         browserSessions.end(request)
         return ResponseEntity.noContent().build()
