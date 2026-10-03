@@ -1,4 +1,3 @@
-
 application:
   mail:
     from: test@kotlin-api.local
