@@ -1,26 +1,17 @@
 spring:
-  application:
-    name: kotlin-api
-
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    open-in-view: false
-    properties:
-      hibernate:
-        format_sql: false
-
   flyway:
-    validate-on-migrate: true
     clean-disabled: true
-
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:true}
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -33,40 +24,25 @@ spring:
           starttls:
             enable: true
             required: true
-          ssl:
-            trust: ${MAIL_SMTP_TRUST}
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
-
-springdoc:
-  api-docs:
-    enabled: false
-  swagger-ui:
-    enabled: false
-
-security:
-  jwt:
-    secret-key: ${JWT_SECRET}
-    access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
-    refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:2592000000}
-    refresh-token-cookie-name: "refresh_token"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_REALM_URL}
 
 application:
   mail:
     from: ${MAIL_FROM}
-  file:
-    uploads:
-      file-output-path: ${FILE_UPLOAD_PATH:/var/app/uploads}
-
   frontend:
     url: ${FRONTEND_URL}
-
-server:
-  port: ${SERVER_PORT:8080}
+  keycloak:
+    server-url: ${KEYCLOAK_SERVER_URL}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET}
+  auth:
+    callback-url: ${AUTH_CALLBACK_URL}
+    post-login-url: ${AUTH_POST_LOGIN_URL}
 
 logging:
   level:
     root: WARN
-    com.vertyll.fastprod: INFO
-    org.springframework.security: INFO
+    com.vertyll.kotlinapi: INFO

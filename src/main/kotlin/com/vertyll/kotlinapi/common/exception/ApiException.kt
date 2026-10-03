@@ -6,4 +6,5 @@ class ApiException(
     val messageKey: String,
     val status: HttpStatus,
     val args: Map<String, Any> = emptyMap(),
-) : RuntimeException(messageKey)
+    cause: Throwable? = null,
+) : RuntimeException(messageKey, cause)

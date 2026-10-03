@@ -1,44 +1,18 @@
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-
-  flyway:
-    enabled: true
-    validate-on-migrate: true
-
-  mail:
-    host: localhost
-    port: 3025
-    username: test
-    password: test
-    properties:
-      mail:
-        smtp:
-          auth: false
-          starttls:
-            enable: false
-
-security:
-  jwt:
-    secret-key: isN5Z1EinzeD2JyjXq6SZqoBd+QpOJMxZsBHwfhXHAA=
-    access-token-expiration: 900000
-    refresh-token-expiration: 2592000000
-    refresh-token-cookie-name: refresh_token
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000/realms/kotlin-api
 
 application:
   mail:
-    from: no-reply@kotlinapi.local
-  file:
-    uploads:
-      file-output-path: ./test-uploads
-
+    from: test@kotlin-api.local
   frontend:
-    url: http://localhost:4200
-
-server:
-  port: 0
+    url: http://localhost:8080
+  keycloak:
+    server-url: http://localhost:9000
+    client-secret: test-secret
+  auth:
+    callback-url: http://localhost:8080/api/v1/auth/callback
+    post-login-url: http://localhost:8080/api/v1/swagger-ui.html

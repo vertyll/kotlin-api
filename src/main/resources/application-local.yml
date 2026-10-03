@@ -1,48 +1,31 @@
 spring:
-  application:
-    name: kotlin-api
-
   devtools:
     restart:
-      enabled: true
       additional-paths: src/main/kotlin,src/main/resources
       poll-interval: 2s
       quiet-period: 1s
-      exclude: static/**,public/**
-
   datasource:
     url: jdbc:postgresql://localhost:5432/kotlin_api
     username: postgres
     password: postgres
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    open-in-view: false
-    properties:
-      hibernate:
-        format_sql: true
-
-  flyway:
-    validate-on-migrate: true
-
+  data:
+    redis:
+      host: localhost
+      port: 6379
   mail:
     host: localhost
     port: 1025
-    username: vertyll
-    password: vertyll
-    properties:
-      mail:
-        smtp:
-          trust: "*"
-          auth: false
-          starttls:
-            enable: false
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000/realms/kotlin-api
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
 
 springdoc:
   api-docs:
@@ -50,28 +33,18 @@ springdoc:
   swagger-ui:
     enabled: true
 
-security:
-  jwt:
-    secret-key: isN5Z1EinzeD2JyjXq6SZqoBd+QpOJMxZsBHwfhXHAA=
-    access-token-expiration: 900000
-    refresh-token-expiration: 2592000000
-    refresh-token-cookie-name: refresh_token
-
 application:
   mail:
-    from: no-reply@kotlinapi.local
-  file:
-    uploads:
-      file-output-path: ./uploads
-
+    from: no-reply@kotlin-api.local
   frontend:
-    url: http://localhost:4200
-
-server:
-  port: 8080
+    url: http://localhost:8080
+  keycloak:
+    server-url: http://localhost:9000
+    client-secret: kotlin-api-local-secret
+  auth:
+    callback-url: http://localhost:8080/api/v1/auth/callback
+    post-login-url: http://localhost:8080/api/v1/swagger-ui.html
 
 logging:
   level:
-    root: INFO
-    com.vertyll.fastprod: DEBUG
-    org.springframework.security: DEBUG
+    com.vertyll.kotlinapi: DEBUG

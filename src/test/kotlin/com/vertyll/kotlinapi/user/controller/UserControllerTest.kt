@@ -1,99 +1,49 @@
 package com.vertyll.kotlinapi.user.controller
 
-import com.vertyll.kotlinapi.user.dto.UserCreateDto
+import com.vertyll.kotlinapi.auth.KeycloakIdentity
 import com.vertyll.kotlinapi.user.dto.UserResponseDto
-import com.vertyll.kotlinapi.user.dto.UserUpdateDto
 import com.vertyll.kotlinapi.user.service.UserService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.springframework.security.oauth2.jwt.Jwt
+import java.time.Instant
 
-@ExtendWith(MockitoExtension::class)
 class UserControllerTest {
-    @Mock
-    private lateinit var userService: UserService
-
-    @InjectMocks
-    private lateinit var userController: UserController
-
-    private val testId = (100..999).random().toLong()
+    private val dto = UserResponseDto(1L, "subject", "Ada", "Lovelace", "ada@kotlin-api.local", setOf("USER"))
 
     @Test
-    fun `createUser should call service and return created user`() {
-        val userCreateDto =
-            UserCreateDto(
-                firstName = "Test",
-                lastName = "User",
-                email = "test@example.com",
-                password = "password123",
-                roleNames = setOf("USER"),
-            )
-        val userResponseDto =
-            UserResponseDto(
-                id = testId,
-                firstName = "Test",
-                lastName = "User",
-                email = "test@example.com",
-                roles = setOf("USER"),
-                enabled = true,
-            )
-        `when`(userService.createUser(userCreateDto)).thenReturn(userResponseDto)
+    fun `me synchronizes the account from the token`() {
+        val service = mock<UserService> { on { sync(any()) } doReturn dto }
+        val jwt =
+            Jwt
+                .withTokenValue("token")
+                .header("alg", "RS256")
+                .subject("subject")
+                .claim("email", "ada@kotlin-api.local")
+                .claim("given_name", "Ada")
+                .claim("family_name", "Lovelace")
+                .claim("realm_access", mapOf("roles" to listOf("USER")))
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(300))
+                .build()
 
-        val response = userController.createUser(userCreateDto)
-
-        verify(userService).createUser(userCreateDto)
-        assertEquals(userResponseDto, response)
+        assertEquals(dto, UserController(service).me(jwt))
+        argumentCaptor<KeycloakIdentity>().apply {
+            verify(service).sync(capture())
+            assertEquals("ada@kotlin-api.local", firstValue.email)
+            assertEquals(setOf("USER"), firstValue.roles)
+        }
     }
 
     @Test
-    fun `updateUser should call service and return updated user`() {
-        val id = testId
-        val userUpdateDto =
-            UserUpdateDto(
-                firstName = "Updated",
-                lastName = "User",
-                email = "updated@example.com",
-                roleNames = setOf("USER", "ADMIN"),
-            )
-        val userResponseDto =
-            UserResponseDto(
-                id = id,
-                firstName = "Updated",
-                lastName = "User",
-                email = "updated@example.com",
-                roles = setOf("USER", "ADMIN"),
-                enabled = true,
-            )
-        `when`(userService.updateUser(id, userUpdateDto)).thenReturn(userResponseDto)
+    fun `getUser delegates to the service`() {
+        val service = mock<UserService> { on { getUserById(1L) } doReturn dto }
 
-        val response = userController.updateUser(id, userUpdateDto)
-
-        verify(userService).updateUser(id, userUpdateDto)
-        assertEquals(userResponseDto, response)
-    }
-
-    @Test
-    fun `getUser should call service and return user`() {
-        val id = testId
-        val userResponseDto =
-            UserResponseDto(
-                id = id,
-                firstName = "Test",
-                lastName = "User",
-                email = "test@example.com",
-                roles = setOf("USER"),
-                enabled = true,
-            )
-        `when`(userService.getUserById(id)).thenReturn(userResponseDto)
-
-        val response = userController.getUser(id)
-
-        verify(userService).getUserById(id)
-        assertEquals(userResponseDto, response)
+        assertEquals(dto, UserController(service).getUser(1L))
     }
 }

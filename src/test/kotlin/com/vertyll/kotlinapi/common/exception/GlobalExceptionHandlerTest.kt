@@ -70,13 +70,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    fun securityExceptions_ShouldMapToKeys() {
-        assertEquals(
-            GlobalExceptionHandler.INVALID_CREDENTIALS,
-            handler.handleBadCredentialsException().detail,
-        )
-        assertEquals(GlobalExceptionHandler.ACCOUNT_DISABLED, handler.handleDisabledException().detail)
-        assertEquals(GlobalExceptionHandler.ACCOUNT_LOCKED, handler.handleLockedException().detail)
+    fun accessDenied_ShouldMapToKey() {
+        assertEquals(GlobalExceptionHandler.ACCESS_DENIED, handler.handleAccessDeniedException().detail)
         assertEquals(
             HttpStatus.FORBIDDEN.value(),
             handler.handleAccessDeniedException().status,

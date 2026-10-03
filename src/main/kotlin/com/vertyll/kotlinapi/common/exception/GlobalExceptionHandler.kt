@@ -6,9 +6,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.authentication.DisabledException
-import org.springframework.security.authentication.LockedException
 import org.springframework.validation.FieldError
 import org.springframework.web.ErrorResponse
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -25,9 +22,6 @@ class GlobalExceptionHandler {
         const val BAD_REQUEST = "errors.common.badRequest"
         const val UNEXPECTED = "errors.common.unexpected"
         const val INVALID_VALUE = "validation.invalid"
-        const val INVALID_CREDENTIALS = "errors.auth.invalidCredentials"
-        const val ACCOUNT_DISABLED = "errors.auth.accountDisabled"
-        const val ACCOUNT_LOCKED = "errors.auth.accountLocked"
         const val ACCESS_DENIED = "errors.auth.accessDenied"
         private val CONSTRAINT_METADATA = setOf("message", "groups", "payload")
     }
@@ -70,15 +64,6 @@ class GlobalExceptionHandler {
         log.debug("Unreadable request: {}", ex.message)
         return Problems.of(HttpStatus.BAD_REQUEST, BAD_REQUEST)
     }
-
-    @ExceptionHandler(BadCredentialsException::class)
-    fun handleBadCredentialsException(): ProblemDetail = Problems.of(HttpStatus.UNAUTHORIZED, INVALID_CREDENTIALS)
-
-    @ExceptionHandler(DisabledException::class)
-    fun handleDisabledException(): ProblemDetail = Problems.of(HttpStatus.FORBIDDEN, ACCOUNT_DISABLED)
-
-    @ExceptionHandler(LockedException::class)
-    fun handleLockedException(): ProblemDetail = Problems.of(HttpStatus.FORBIDDEN, ACCOUNT_LOCKED)
 
     @ExceptionHandler(AccessDeniedException::class)
     fun handleAccessDeniedException(): ProblemDetail = Problems.of(HttpStatus.FORBIDDEN, ACCESS_DENIED)
