@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.time.Duration
+import java.time.Instant
 import java.util.HexFormat
 
 @Component
@@ -57,7 +58,7 @@ class SharedRefreshes(
             }
         }
         try {
-            store.opsForValue().set(resultKey, "${pair.accessToken}$SEPARATOR${pair.refreshToken}", RESULT_TTL)
+            store.opsForValue().set(resultKey, pair.serialize(), RESULT_TTL)
         } catch (e: DataAccessException) {
             log.warn("Could not share the refreshed tokens with other replicas: {}", e.message)
         }
@@ -91,8 +92,7 @@ class SharedRefreshes(
         resultKey: String,
     ): TokenPair? {
         val value = store.opsForValue().get(resultKey) ?: return null
-        val separator = value.indexOf(SEPARATOR)
-        return if (separator < 0) null else TokenPair(value.substring(0, separator), value.substring(separator + 1))
+        return TokenPair.parse(value)
     }
 
     private fun release(
@@ -109,8 +109,24 @@ class SharedRefreshes(
     data class TokenPair(
         val accessToken: String,
         val refreshToken: String,
+        val issuedAt: Instant,
+        val expiresAt: Instant,
     ) {
-        override fun toString(): String = "TokenPair(accessToken=***, refreshToken=***)"
+        fun serialize(): String = listOf(accessToken, refreshToken, issuedAt.toString(), expiresAt.toString()).joinToString(SEPARATOR)
+
+        override fun toString(): String = "TokenPair(accessToken=***, refreshToken=***, issuedAt=$issuedAt, expiresAt=$expiresAt)"
+
+        companion object {
+            private const val FIELDS = 4
+
+            fun parse(value: String): TokenPair? {
+                val fields = value.split(SEPARATOR)
+                if (fields.size != FIELDS) {
+                    return null
+                }
+                return TokenPair(fields[0], fields[1], Instant.parse(fields[2]), Instant.parse(fields.last()))
+            }
+        }
     }
 
     companion object {

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.testcontainers.containers.GenericContainer
+import java.time.Instant
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -28,7 +29,7 @@ class SharedRefreshesTest {
                     calls.incrementAndGet()
                     entered.countDown()
                     release.await(5, TimeUnit.SECONDS)
-                    SharedRefreshes.TokenPair("access-2", "refresh-2")
+                    pair("access-2", "refresh-2")
                 }
             }
         assertThat(entered.await(5, TimeUnit.SECONDS)).isTrue()
@@ -36,7 +37,7 @@ class SharedRefreshesTest {
             CompletableFuture.supplyAsync {
                 second.refresh("refresh-1") {
                     calls.incrementAndGet()
-                    SharedRefreshes.TokenPair("access-3", "refresh-3")
+                    pair("access-3", "refresh-3")
                 }
             }
         release.countDown()
@@ -48,7 +49,7 @@ class SharedRefreshesTest {
 
     @Test
     fun `a stale request receives the tokens already issued`() {
-        SharedRefreshes(redis, RedisKeyProperties("test-b")).refresh("refresh-1") { SharedRefreshes.TokenPair("access-2", "refresh-2") }
+        SharedRefreshes(redis, RedisKeyProperties("test-b")).refresh("refresh-1") { pair("access-2", "refresh-2") }
 
         val stale = SharedRefreshes(redis, RedisKeyProperties("test-b")).refresh("refresh-1") { error("Keycloak must not be asked twice") }
 
@@ -60,20 +61,26 @@ class SharedRefreshesTest {
         val replica = SharedRefreshes(redis, RedisKeyProperties("test-c"))
         assertThatThrownBy { replica.refresh("refresh-1") { error("refused") } }.isInstanceOf(IllegalStateException::class.java)
 
-        val retried = replica.refresh("refresh-1") { SharedRefreshes.TokenPair("access-2", "refresh-2") }
+        val retried = replica.refresh("refresh-1") { pair("access-2", "refresh-2") }
 
         assertThat(retried.refreshToken).isEqualTo("refresh-2")
     }
 
     @Test
     fun `keys carry the application prefix and never the token`() {
-        SharedRefreshes(redis, RedisKeyProperties("test-d")).refresh("secret-refresh") { SharedRefreshes.TokenPair("access", "refresh") }
+        SharedRefreshes(redis, RedisKeyProperties("test-d")).refresh("secret-refresh") { pair("access", "refresh") }
 
         assertThat(redis.keys("test-d:refresh-result:*")).hasSize(1)
         assertThat(redis.keys("*secret-refresh*")).isEmpty()
     }
 
+    private fun pair(
+        accessToken: String,
+        refreshToken: String,
+    ): SharedRefreshes.TokenPair = SharedRefreshes.TokenPair(accessToken, refreshToken, ISSUED_AT, ISSUED_AT.plusSeconds(300))
+
     companion object {
+        private val ISSUED_AT = Instant.parse("2026-01-01T00:00:00Z")
         private val container = GenericContainer("redis:8-alpine").withExposedPorts(6379)
         private lateinit var connections: LettuceConnectionFactory
         private lateinit var redis: StringRedisTemplate

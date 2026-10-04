@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.spring.boot.starter.mail)
     implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.boot.starter.security.oauth2.client)
     implementation(libs.spring.boot.starter.security.oauth2.resource.server)
     implementation(libs.spring.boot.starter.session.data.redis)
     if (System.getProperty("os.name").startsWith("Mac")) {
