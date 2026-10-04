@@ -12,10 +12,8 @@ import java.util.HexFormat
 @Component
 class SharedRefreshes(
     private val redis: StringRedisTemplate?,
-    private val properties: RedisKeyProperties,
+    private val redisKeyProperties: RedisKeyProperties,
 ) {
-    private val keyPrefix = properties.keyPrefix
-
     private val log = LoggerFactory.getLogger(SharedRefreshes::class.java)
 
     fun refresh(
@@ -24,8 +22,8 @@ class SharedRefreshes(
     ): TokenPair {
         val store = redis ?: return keycloak()
         val id = sha256(refreshToken)
-        val lockKey = "$keyPrefix:refresh-lock:$id"
-        val resultKey = "$keyPrefix:refresh-result:$id"
+        val lockKey = "${redisKeyProperties.keyPrefix}:refresh-lock:$id"
+        val resultKey = "${redisKeyProperties.keyPrefix}:refresh-result:$id"
         val shared: TokenPair?
         val leader: Boolean
         try {

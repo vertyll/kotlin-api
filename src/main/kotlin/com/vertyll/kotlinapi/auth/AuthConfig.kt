@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient
 import java.time.Clock
 
 @Configuration
-@EnableConfigurationProperties(KeycloakProperties::class, AuthProperties::class)
+@EnableConfigurationProperties(KeycloakProperties::class, AuthProperties::class, RedisKeyProperties::class)
 class AuthConfig {
     @Bean
     fun keycloakRestClient(): RestClient = RestClient.create()
