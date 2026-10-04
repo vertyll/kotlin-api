@@ -25,6 +25,7 @@ class KeycloakTokenClient(
     private val jwtDecoder: JwtDecoder,
     private val clock: Clock,
     private val restClient: RestClient,
+    private val sharedRefreshes: SharedRefreshes,
 ) {
     private val log = LoggerFactory.getLogger(KeycloakTokenClient::class.java)
     private val refreshes = ConcurrentHashMap<String, Refresh>()
@@ -32,16 +33,19 @@ class KeycloakTokenClient(
     fun exchange(
         code: String,
         codeVerifier: String,
-    ): AuthSession =
-        post(
-            form(
-                GRANT_TYPE to "authorization_code",
-                "code" to code,
-                "code_verifier" to codeVerifier,
-                "redirect_uri" to auth.callbackUrl,
-            ),
-            AuthErrors.SIGN_IN_REJECTED,
-        )
+    ): AuthSession {
+        val tokens =
+            tokens(
+                form(
+                    GRANT_TYPE to "authorization_code",
+                    "code" to code,
+                    "code_verifier" to codeVerifier,
+                    "redirect_uri" to auth.callbackUrl,
+                ),
+                AuthErrors.SIGN_IN_REJECTED,
+            )
+        return toSession(tokens.accessToken, tokens.refreshToken, AuthErrors.SIGN_IN_REJECTED)
+    }
 
     fun refresh(refreshToken: String): AuthSession {
         forgetOldRefreshes()
@@ -96,8 +100,13 @@ class KeycloakTokenClient(
         }
     }
 
-    private fun requestRefresh(refreshToken: String): AuthSession =
-        post(form(GRANT_TYPE to REFRESH_TOKEN, REFRESH_TOKEN to refreshToken), AuthErrors.SESSION_EXPIRED)
+    private fun requestRefresh(refreshToken: String): AuthSession {
+        val tokens =
+            sharedRefreshes.refresh(refreshToken) {
+                tokens(form(GRANT_TYPE to REFRESH_TOKEN, REFRESH_TOKEN to refreshToken), AuthErrors.SESSION_EXPIRED)
+            }
+        return toSession(tokens.accessToken, tokens.refreshToken, AuthErrors.SESSION_EXPIRED)
+    }
 
     private fun forgetOldRefreshes() {
         val oldest = clock.instant().minus(REUSE_WINDOW)
@@ -111,10 +120,10 @@ class KeycloakTokenClient(
             fields.forEach { (name, value) -> add(name, value) }
         }
 
-    private fun post(
+    private fun tokens(
         form: MultiValueMap<String, String>,
         onRejection: String,
-    ): AuthSession {
+    ): SharedRefreshes.TokenPair {
         val response =
             try {
                 restClient
@@ -131,7 +140,7 @@ class KeycloakTokenClient(
             }
         val accessToken = response?.accessToken ?: throw AuthErrors.unavailable()
         val refreshToken = response.refreshToken ?: throw AuthErrors.unavailable()
-        return toSession(accessToken, refreshToken, onRejection)
+        return SharedRefreshes.TokenPair(accessToken, refreshToken)
     }
 
     private fun toSession(

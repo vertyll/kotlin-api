@@ -40,6 +40,7 @@ class KeycloakTokenClientTest {
             },
             Clock.systemUTC(),
             builder.build(),
+            SharedRefreshes.inProcessOnly(),
         )
 
     @Test
