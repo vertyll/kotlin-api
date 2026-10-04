@@ -37,16 +37,23 @@ Showcase Kotlin and Spring Boot API.
 
 ### Authentication:
 
-- Keycloak (realm `kotlin-api`) handles sign-up, sign-in, email verification, password reset, two-factor
-  authentication and acceptance of the terms of use.
-- A browser signs in at `GET /api/v1/auth/authorize` with the authorization code flow and PKCE, and then holds only
-  the `KOTLIN_API_SESSION` cookie (`HttpOnly`, `SameSite=Lax`, `Secure` in production). The tokens stay in the session,
-  stored in Redis.
-- The API is a stateless OAuth2 resource server: it verifies the token's signature, issuer, expiry and audience
-  (`kotlin-api`) and takes the roles (`USER`, `ADMIN`) from it. Refresh tokens rotate on every use.
-- Locally, `docker-compose.local.yml` runs PostgreSQL, Redis, RedisInsight (`:5540`, connected to Redis), Keycloak on
-  `:9000` (admin/admin) and maildev. The realm from `keycloak/realm-export.json` has `admin@kotlin-api.local`
-  (`ADMIN`) and `user@kotlin-api.local`, both with the password `kotlin-api-local`.
+- **Identity provider**: Keycloak (realm `kotlin-api`) owns every page that touches a credential: sign-up, sign-in,
+  email verification, password reset, two-factor authentication and acceptance of the terms of use. The application
+  never sees a password.
+- **Pattern**: BFF. A browser signs in at `GET /api/v1/auth/authorize` with the authorization code flow and PKCE; the
+  back-end keeps the tokens and the browser holds only the `KOTLIN_API_SESSION` cookie (`HttpOnly`, `SameSite=Lax`,
+  `Secure` in production).
+- **Session store**: Redis (Spring Session, `kotlin-api:session` namespace), so the application holds no state of its
+  own.
+- **JWT**: the API is a stateless OAuth2 resource server verifying signature, issuer, expiry and audience (`kotlin-api`)
+  and taking the roles (`USER`, `ADMIN`) from the token; requests with a session get the token attached on the server,
+  and a client with its own token calls it with `Authorization: Bearer`.
+- **Token lifecycle**: access tokens live five minutes; every refresh returns a new refresh token and invalidates the
+  old one, and concurrent requests of one session share a single refresh. Signing out revokes the refresh token at
+  Keycloak.
+- **Cross-site requests**: `SameSite=Lax` plus `Sec-Fetch-Site`, so a write or a logout sent from another site is
+  refused.
+- **Accounts**: created in PostgreSQL at the first sign-in, mirroring email, name and roles from Keycloak.
 
 ### Core back-end:
 
