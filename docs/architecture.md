@@ -9,7 +9,7 @@ The code is split by feature, and each feature keeps its own controller, service
 | `auth`        | sign-in, the session, token refresh and the identity read from Keycloak's token |
 | `user`        | the local account mirrored from Keycloak                                        |
 | `role`        | the roles the application knows (`USER`, `ADMIN`)                               |
-| `translation` | the message catalogue, its defaults and the admin endpoints that override them  |
+| `translation` | the message catalog, its defaults and the admin endpoints that override them    |
 | `config`      | security, CORS, OpenAPI and auditing                                            |
 | `common`      | the base entity and the error handling                                          |
 
@@ -36,17 +36,17 @@ Every refusal is an RFC 9457 problem document (`application/problem+json`, built
 |----------|-----------------------------------------------------------------------|
 | `status` | the HTTP status                                                       |
 | `detail` | the same key as `code`                                                |
-| `code`   | a key of the translation catalogue, e.g. `errors.user.notFound`       |
+| `code`   | a key of the translation catalog, e.g. `errors.user.notFound`         |
 | `args`   | the ICU arguments for that key; in a validation error, keyed by field |
 | `errors` | in a validation error, the message keys of each invalid field         |
 
-The client translates: it loads the catalogue once from `GET /translations/{language}` and formats `code` with `args`
+The client translates: it loads the catalog once from `GET /translations/{language}` and formats `code` with `args`
 as an ICU MessageFormat message, in its reader's language. A new error is therefore a new key in
 `src/main/resources/i18n/en.json` and `pl.json`, never a sentence in the code.
 
 ## Translations
 
-The catalogue ships in `src/main/resources/i18n/en.json` and `pl.json`, ICU MessageFormat. At startup
+The catalog ships in `src/main/resources/i18n/en.json` and `pl.json`, ICU MessageFormat. At startup
 `TranslationSynchronizer` brings the `translation` table in line with those files: new keys are added, changed defaults
 adopted and keys the code no longer uses dropped.
 

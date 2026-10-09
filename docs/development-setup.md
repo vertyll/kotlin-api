@@ -40,7 +40,7 @@ Keycloak imports `keycloak/realm-export.json` on its first start, with two accou
 ```
 
 The `local` profile is the default, and `application-local.yml` already points at the containers above: there is
-nothing to configure and no `.env` to create. Flyway migrates the database on start, and the translation catalogue is
+nothing to configure and no `.env` to create. Flyway migrates the database on start, and the translation catalog is
 filled from `src/main/resources/i18n`.
 
 The Swagger UI is at `http://localhost:8080/api/v1/swagger-ui.html` (local profile only). Open
