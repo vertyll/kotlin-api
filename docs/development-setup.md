@@ -71,3 +71,16 @@ The image (`Dockerfile`) runs with the `prod` profile, which takes its settings 
 | `AUTH_CALLBACK_URL`, `AUTH_POST_LOGIN_URL`                              | where Keycloak returns and where it lands   |
 | `FRONTEND_URL`                                                          | the only origin CORS admits                 |
 | `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM` | SMTP with STARTTLS                          |
+
+## Documentation checks
+
+The Markdown is formatted and linted with [mdtools](https://github.com/vertyll/mdtools), at the version the
+[Docs workflow](../.github/workflows/docs.yml) pins:
+
+```bash
+go run github.com/vertyll/mdtools/cmd/mdtools@VERSION fmt
+go run github.com/vertyll/mdtools/cmd/mdtools@VERSION run
+```
+
+`fmt` rewrites what it can; `run` reports the rest and fails on any issue, as the workflow does on every push and pull
+request. [`.mdtools.yaml`](../.mdtools.yaml) chooses the formatters and linters and what each one skips.
