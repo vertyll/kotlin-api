@@ -41,7 +41,7 @@ Showcase Kotlin and Spring Boot API.
 - **Pattern**: BFF with Spring Security's OAuth2 client; the browser holds only a session cookie.
 - **Session store**: Redis (Spring Session).
 - **JWT**: the back-end is a stateless resource server; roles (`USER`, `ADMIN`) come from the token.
-- **Details**: [Authentication](./docs/authentication.md).
+- **Details**: [Authentication](docs/authentication.md).
 
 ### Core back-end:
 
@@ -63,8 +63,6 @@ Showcase Kotlin and Spring Boot API.
 
 ## Documentation
 
-- [Glossary](./GLOSSARY.md) – every term the docs use, and where it is explained.
-- [Standards](./STANDARDS.md) – the RFCs and specifications the code implements or depends on.
-- [Development Setup](./docs/development-setup.md) – running the infrastructure, the application and the checks.
-- [Architecture](./docs/architecture.md) – packages, endpoints, accounts, errors and translations.
-- [Authentication](./docs/authentication.md) – sign-in, tokens, sessions and refreshing.
+- [Contents](CONTENTS.md) – every document in the repository, the module it belongs to, and what it covers.
+- [Glossary](GLOSSARY.md) – every term the docs use, and where it is explained.
+- [Standards](STANDARDS.md) – the RFCs and specifications the code implements or depends on.
