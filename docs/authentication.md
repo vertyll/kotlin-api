@@ -22,8 +22,8 @@ The browser holds only the `KOTLIN_API_SESSION` cookie: `HttpOnly`, `SameSite=La
 ## Every request is authorized by a token
 
 The back-end is an OAuth2 resource server. It verifies the token's signature against Keycloak's published keys, its
-issuer, its expiry and its audience (`kotlin-api`), and takes the roles from `realm_access.roles`, so `ADMIN` in Keycloak
-becomes `ROLE_ADMIN` here.
+issuer, its expiry and its audience (`kotlin-api`), and takes the roles from `realm_access.roles`, so `ADMIN` in
+Keycloak becomes `ROLE_ADMIN` here.
 
 A request carries the token in one of two ways:
 
@@ -39,9 +39,12 @@ Either way the decision rests on the token alone, not on the session, so any ins
 The session lives in Redis (Spring Session, namespace `kotlin-api:session`) and lasts ten hours. Access tokens live
 five minutes, and the session's token is refreshed when less than a minute of it is left.
 
-Keycloak rotates refresh tokens: every refresh returns a new one and invalidates the old one, and replaying a spent one
-ends the session. Two requests of one session refreshing at once would therefore sign the user out, so a refresh runs
-once per refresh token:
+> [!IMPORTANT]
+>
+> Keycloak rotates refresh tokens: every refresh returns a new one and invalidates the old one, and replaying a spent
+> one ends the session. Two requests of one session refreshing at once would therefore sign the user out.
+
+A refresh therefore runs once per refresh token:
 
 - within one instance, `SingleFlightRefreshTokenProvider` lets the first request refresh and hands its result to the
   others;

@@ -28,8 +28,10 @@ Keycloak imports `keycloak/realm-export.json` on its first start, with two accou
 | `admin@kotlin-api.local` | `kotlin-api-local` | `USER`, `ADMIN` |
 | `user@kotlin-api.local`  | `kotlin-api-local` | `USER`          |
 
-The realm lives in the `keycloak-data` volume afterwards, so a change to the export file only takes effect after
-`docker compose -f docker-compose.local.yml down -v`.
+> [!NOTE]
+>
+> The realm lives in the `keycloak-data` volume afterwards, so a change to the export file only takes effect after
+> `docker compose -f docker-compose.local.yml down -v`.
 
 ## Run the application
 
@@ -41,11 +43,8 @@ The `local` profile is the default, and `application-local.yml` already points a
 nothing to configure and no `.env` to create. Flyway migrates the database on start, and the translation catalogue is
 filled from `src/main/resources/i18n`.
 
-| Address                                        | What                               |
-|------------------------------------------------|------------------------------------|
-| `http://localhost:8080/api/v1/swagger-ui.html` | Swagger UI (local profile only)    |
-| `http://localhost:8080/api/v1/auth/authorize`  | sign in; returns to the Swagger UI |
-| `http://localhost:8080/api/v1/actuator/health` | health                             |
+The Swagger UI is at `http://localhost:8080/api/v1/swagger-ui.html` (local profile only). Open
+`http://localhost:8080/api/v1/auth/authorize` to sign in; Keycloak returns you to the Swagger UI.
 
 Signing in through the browser leaves a session cookie, so Swagger's "Try it out" calls run as the signed-in user.
 
