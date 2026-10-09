@@ -60,3 +60,9 @@ Showcase Kotlin and Spring Boot API.
 - Docker for development environment.
 - Detekt for static code analysis.
 - ktlint for code formatting.
+
+## Documentation
+
+- [Development Setup](./docs/development-setup.md) – running the infrastructure, the application and the checks.
+- [Architecture](./docs/architecture.md) – packages, endpoints, accounts, errors and translations.
+- [Authentication](./docs/authentication.md) – sign-in, tokens, sessions and refreshing.
