@@ -63,6 +63,7 @@ Showcase Kotlin and Spring Boot API.
 
 ## Documentation
 
+- [Glossary](./GLOSSARY.md) – the terms, the standards they come from, and where each is explained.
 - [Development Setup](./docs/development-setup.md) – running the infrastructure, the application and the checks.
 - [Architecture](./docs/architecture.md) – packages, endpoints, accounts, errors and translations.
 - [Authentication](./docs/authentication.md) – sign-in, tokens, sessions and refreshing.
