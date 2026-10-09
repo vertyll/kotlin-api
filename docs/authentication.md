@@ -6,6 +6,27 @@ application is a BFF: it runs the sign-in, keeps the tokens on the server and gi
 
 ## Signing in
 
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant A as kotlin-api
+    participant K as Keycloak
+    participant R as Redis
+
+    B->>A: GET /api/v1/auth/authorize
+    A-->>B: 302 to Keycloak, with state and the PKCE challenge
+    B->>K: sign in on Keycloak's page
+    K-->>B: 302 to /api/v1/auth/callback?code&state
+    B->>A: GET /api/v1/auth/callback?code&state
+    A->>K: code + client secret + PKCE verifier
+    K-->>A: access, refresh and ID token
+    A->>R: store the tokens in the session
+    A-->>B: 302 to the post-login URL, Set-Cookie with the session id
+    B->>A: API call + session cookie
+    A->>R: read the session
+    Note over A: the request is authorized by the session's access token
+```
+
 1. The browser opens `GET /api/v1/auth/authorize`. `HostedSignInRequests` builds the authorization request with PKCE
    and redirects to Keycloak. Optional parameters pass through: `register=true` opens the sign-up page, and `kc_action`
    starts one of `CONFIGURE_TOTP`, `UPDATE_PASSWORD` or `delete_credential`. The browser's language picks Keycloak's
