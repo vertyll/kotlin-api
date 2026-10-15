@@ -7,13 +7,15 @@
     <img alt="" src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
 </p>
 
+# Kotlin API
+
 ## Project Assumptions
 
 Showcase Kotlin and Spring Boot API.
 
 ## Technology Stack
 
-### Back-end:
+### Back-end
 
 - Spring Boot.
 - Kotlin.
@@ -35,7 +37,7 @@ Showcase Kotlin and Spring Boot API.
 - OpenAPI (Swagger).
 - ICU4J.
 
-### Authentication:
+### Authentication
 
 - **Identity provider**: Keycloak (realm `kotlin-api`); the application never sees a password.
 - **Pattern**: BFF with Spring Security's OAuth2 client; the browser holds only a session cookie.
@@ -43,7 +45,7 @@ Showcase Kotlin and Spring Boot API.
 - **JWT**: the back-end is a stateless resource server; roles (`USER`, `ADMIN`) come from the token.
 - **Details**: [Authentication](docs/authentication.md).
 
-### Core back-end:
+### Core back-end
 
 - Gradle build system.
 - The application has an exception handling mechanism (RFC 9457 problem details with message codes).
@@ -55,7 +57,7 @@ Showcase Kotlin and Spring Boot API.
 - The application has translations (ICU MessageFormat) editable by an admin.
 - And many other features that can be found in the application code.
 
-### Other:
+### Other
 
 - Docker for development environment.
 - Detekt for static code analysis.
