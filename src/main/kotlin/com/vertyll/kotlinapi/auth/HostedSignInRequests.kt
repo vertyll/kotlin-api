@@ -1,5 +1,6 @@
 package com.vertyll.kotlinapi.auth
 
+import com.vertyll.kotlinapi.translation.model.Language
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
@@ -28,10 +29,8 @@ class HostedSignInRequests(
         return OAuth2AuthorizationRequest
             .from(authorization)
             .additionalParameters { parameters ->
-                request.locale.language
-                    .takeIf { it in UI_LOCALES }
-                    ?.let { parameters["ui_locales"] = it }
-                request.getParameter(KC_ACTION)?.takeIf { it in ALLOWED_ACTIONS }?.let { parameters[KC_ACTION] = it }
+                Language.fromCode(request.locale.language)?.let { parameters["ui_locales"] = it.code }
+                request.getParameter(KC_ACTION)?.takeIf(::isAccountAction)?.let { parameters[KC_ACTION] = it }
                 if (request.getParameter("register").toBoolean()) {
                     parameters["prompt"] = "create"
                 }
@@ -42,7 +41,12 @@ class HostedSignInRequests(
         const val REGISTRATION_ID = "keycloak"
         const val AUTHORIZE_PATH = "/auth/authorize"
         private const val KC_ACTION = "kc_action"
-        private val ALLOWED_ACTIONS = setOf("CONFIGURE_TOTP", "UPDATE_PASSWORD", "delete_credential")
-        private val UI_LOCALES = setOf("pl", "en")
+        private val ACCOUNT_ACTIONS = setOf("CONFIGURE_TOTP", "UPDATE_PASSWORD")
+
+        // Keycloak removes a credential only when named by its id, and asks the person to confirm first.
+        private val DELETE_CREDENTIAL =
+            Regex("delete_credential:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+
+        private fun isAccountAction(action: String): Boolean = action in ACCOUNT_ACTIONS || DELETE_CREDENTIAL.matches(action)
     }
 }

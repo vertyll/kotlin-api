@@ -96,6 +96,32 @@ class HostedSignInTest {
     }
 
     @Test
+    fun `authorize passes on removing a credential named by its id`() {
+        val action = "delete_credential:0b7f6a52-3c1e-4d2a-9f5b-6e8d7c1a2b3c"
+
+        val result =
+            mvc
+                .get()
+                .uri("/auth/authorize")
+                .param("kc_action", action)
+                .exchange()
+
+        assertThat(queryOf(result)["kc_action"]).containsExactly(action)
+    }
+
+    @Test
+    fun `authorize drops an action Keycloak is not asked for`() {
+        val result =
+            mvc
+                .get()
+                .uri("/auth/authorize")
+                .param("kc_action", "delete_credential")
+                .exchange()
+
+        assertThat(queryOf(result)["kc_action"]).isNull()
+    }
+
+    @Test
     fun `a callback with a state this browser was not given is refused`() {
         val browser = Browser()
         browser.send(mvc.get().uri("/auth/authorize"))
