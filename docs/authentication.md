@@ -30,8 +30,8 @@ sequenceDiagram
 1. The browser opens `GET /api/v1/auth/authorize`. `HostedSignInRequests` builds the authorization request with PKCE
    and redirects to Keycloak. Optional parameters pass through: `register=true` opens the sign-up page, and `kc_action`
    starts one of `CONFIGURE_TOTP`, `UPDATE_PASSWORD` or `delete_credential:<id>`, with a credential's UUID, which
-   Keycloak asks to confirm; any other value is dropped. The browser's language picks Keycloak's language when the
-   application has it (`Language`).
+   Keycloak asks to confirm; any other value is dropped. Keycloak's language is the first of the browser's languages
+   the application has (`Language`).
 2. Keycloak returns to `GET /api/v1/auth/callback`. Spring Security's OAuth2 client exchanges the code, using the
    confidential client `kotlin-api` and its secret, and stores the tokens in the HTTP session.
 3. `SignInCompletion` decodes the access token, mirrors the account into PostgreSQL and redirects to

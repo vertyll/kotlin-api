@@ -29,7 +29,10 @@ class HostedSignInRequests(
         return OAuth2AuthorizationRequest
             .from(authorization)
             .additionalParameters { parameters ->
-                Language.fromCode(request.locale.language)?.let { parameters["ui_locales"] = it.code }
+                request.locales
+                    .asSequence()
+                    .firstNotNullOfOrNull { Language.fromCode(it.language) }
+                    ?.let { parameters["ui_locales"] = it.code }
                 request.getParameter(KC_ACTION)?.takeIf(::isAccountAction)?.let { parameters[KC_ACTION] = it }
                 if (request.getParameter("register").toBoolean()) {
                     parameters["prompt"] = "create"

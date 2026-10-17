@@ -7,6 +7,8 @@ import jakarta.servlet.http.Cookie
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -109,16 +111,53 @@ class HostedSignInTest {
         assertThat(queryOf(result)["kc_action"]).containsExactly(action)
     }
 
-    @Test
-    fun `authorize drops an action Keycloak is not asked for`() {
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "delete_credential",
+            "VERIFY_EMAIL",
+            "delete_credential:0b7f6a52-3c1e-4d2a-9f5b-6e8d7c1a2b3c&prompt=none",
+            "delete_credential:0b7f6a52-3c1e-4d2a-9f5b-6e8d7c1a2b3c CONFIGURE_TOTP",
+            "delete_credential:0B7F6A52-3C1E-4D2A-9F5B-6E8D7C1A2B3C",
+            "delete_credential:0b7f6a52-3c1e-4d2a-9f5b",
+            "x delete_credential:0b7f6a52-3c1e-4d2a-9f5b-6e8d7c1a2b3c",
+        ],
+    )
+    fun `authorize drops an action Keycloak is not asked for`(action: String) {
         val result =
             mvc
                 .get()
                 .uri("/auth/authorize")
-                .param("kc_action", "delete_credential")
+                .param("kc_action", action)
                 .exchange()
 
-        assertThat(queryOf(result)["kc_action"]).isNull()
+        val query = queryOf(result)
+        assertThat(query["kc_action"]).isNull()
+        assertThat(query["prompt"]).isNull()
+    }
+
+    @Test
+    fun `authorize names the first of the reader's languages the application has`() {
+        val result =
+            mvc
+                .get()
+                .uri("/auth/authorize")
+                .header("Accept-Language", "de, pl;q=0.8")
+                .exchange()
+
+        assertThat(queryOf(result)["ui_locales"]).containsExactly("pl")
+    }
+
+    @Test
+    fun `authorize names no language when the application has none of the reader's`() {
+        val result =
+            mvc
+                .get()
+                .uri("/auth/authorize")
+                .header("Accept-Language", "de")
+                .exchange()
+
+        assertThat(queryOf(result)["ui_locales"]).isNull()
     }
 
     @Test
