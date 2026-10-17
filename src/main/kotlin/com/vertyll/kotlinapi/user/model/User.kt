@@ -15,10 +15,8 @@ import jakarta.persistence.Table
 class User(
     @Column(nullable = false, unique = true, updatable = false)
     val keycloakId: String,
-    @Column(nullable = false)
-    var firstName: String,
-    @Column(nullable = false)
-    var lastName: String,
+    @Column(nullable = false, unique = true)
+    var username: String,
     @Column(nullable = false, unique = true)
     var email: String,
     @ManyToMany(fetch = FetchType.EAGER)
@@ -31,13 +29,11 @@ class User(
 ) : BaseEntity() {
     fun syncIdentity(
         email: String,
-        firstName: String,
-        lastName: String,
+        username: String,
         roles: Set<Role>,
     ) {
         this.email = email
-        this.firstName = firstName
-        this.lastName = lastName
+        this.username = username
         this.roles = roles.toMutableSet()
     }
 }

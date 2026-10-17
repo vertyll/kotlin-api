@@ -23,8 +23,7 @@ class UserServiceTest {
         KeycloakIdentity(
             keycloakId = "7d1c9a52-3a43-4c34-9a8f-2f5d7c6f1b10",
             email = "ada@kotlin-api.local",
-            firstName = "Ada",
-            lastName = "Lovelace",
+            username = "ada",
             roles = setOf("USER", "UNKNOWN"),
         )
     private val roleService =
@@ -43,13 +42,13 @@ class UserServiceTest {
 
     @Test
     fun `a later sign-in mirrors what changed in Keycloak`() {
-        val existing = User(keycloakId = identity.keycloakId, firstName = "Old", lastName = "Name", email = "old@kotlin-api.local")
+        val existing = User(keycloakId = identity.keycloakId, username = "old", email = "old@kotlin-api.local")
         val repository = savingRepository(Optional.of(existing))
 
         val user = UserService(repository, roleService).sync(identity.copy(roles = setOf("ADMIN")))
 
         assertEquals("ada@kotlin-api.local", user.email)
-        assertEquals("Ada", user.firstName)
+        assertEquals("ada", user.username)
         assertEquals(setOf("ADMIN"), user.roles)
     }
 

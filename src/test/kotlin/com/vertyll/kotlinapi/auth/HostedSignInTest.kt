@@ -280,8 +280,7 @@ class HostedSignInTest {
             .header("alg", "RS256")
             .subject(SUBJECT)
             .apply { email?.let { claim("email", it) } }
-            .claim("given_name", "Ada")
-            .claim("family_name", "Lovelace")
+            .claim("preferred_username", "ada")
             .claim("realm_access", mapOf("roles" to listOf("ADMIN")))
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plusSeconds(LIFETIME_SECONDS))

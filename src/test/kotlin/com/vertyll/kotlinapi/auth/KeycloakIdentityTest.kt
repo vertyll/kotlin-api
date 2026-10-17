@@ -1,6 +1,7 @@
 package com.vertyll.kotlinapi.auth
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.security.oauth2.jwt.Jwt
 import java.time.Instant
@@ -24,11 +25,17 @@ class KeycloakIdentityTest {
     }
 
     @Test
-    fun `missing names become empty rather than failing the sign-in`() {
-        val identity = KeycloakIdentity.from(token(mapOf("email" to "ada@kotlin-api.local")))
+    fun `the account takes its username from the token`() {
+        val identity = KeycloakIdentity.from(token(mapOf("email" to "ada@kotlin-api.local", "preferred_username" to "ada")))
 
-        assertEquals("", identity.firstName)
-        assertEquals("ada@kotlin-api.local", identity.email)
+        assertEquals("ada", identity.username)
+    }
+
+    @Test
+    fun `a token without a username is refused`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            KeycloakIdentity.from(token(mapOf("email" to "ada@kotlin-api.local")))
+        }
     }
 
     private fun token(claims: Map<String, Any>): Jwt =

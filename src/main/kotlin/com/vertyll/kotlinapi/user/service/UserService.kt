@@ -29,12 +29,11 @@ class UserService(
                 .orElseGet {
                     User(
                         keycloakId = identity.keycloakId,
-                        firstName = identity.firstName,
-                        lastName = identity.lastName,
+                        username = identity.username,
                         email = identity.email,
                     )
                 }
-        user.syncIdentity(identity.email, identity.firstName, identity.lastName, roles)
+        user.syncIdentity(identity.email, identity.username, roles)
         return mapToDto(userRepository.save(user))
     }
 
@@ -49,8 +48,7 @@ class UserService(
         UserResponseDto(
             id = checkNotNull(user.id),
             keycloakId = user.keycloakId,
-            firstName = user.firstName,
-            lastName = user.lastName,
+            username = user.username,
             email = user.email,
             roles = user.roles.map { it.name }.toSet(),
         )

@@ -6,8 +6,7 @@ import java.io.Serializable
 data class KeycloakIdentity(
     val keycloakId: String,
     val email: String,
-    val firstName: String,
-    val lastName: String,
+    val username: String,
     val roles: Set<String>,
 ) : Serializable {
     companion object {
@@ -21,8 +20,7 @@ data class KeycloakIdentity(
             KeycloakIdentity(
                 keycloakId = requireNotNull(jwt.subject) { "The token has no subject" },
                 email = requireNotNull(jwt.getClaimAsString("email")) { "The token has no email" },
-                firstName = jwt.getClaimAsString("given_name").orEmpty(),
-                lastName = jwt.getClaimAsString("family_name").orEmpty(),
+                username = requireNotNull(jwt.getClaimAsString("preferred_username")) { "The token has no username" },
                 roles = realmRoles(jwt),
             )
 

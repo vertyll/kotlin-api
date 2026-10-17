@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 import java.time.Instant
 
 class UserControllerTest {
-    private val dto = UserResponseDto(1L, "subject", "Ada", "Lovelace", "ada@kotlin-api.local", setOf("USER"))
+    private val dto = UserResponseDto(1L, "subject", "ada", "ada@kotlin-api.local", setOf("USER"))
 
     @Test
     fun `me synchronizes the account from the token`() {
@@ -25,8 +25,7 @@ class UserControllerTest {
                 .header("alg", "RS256")
                 .subject("subject")
                 .claim("email", "ada@kotlin-api.local")
-                .claim("given_name", "Ada")
-                .claim("family_name", "Lovelace")
+                .claim("preferred_username", "ada")
                 .claim("realm_access", mapOf("roles" to listOf("USER")))
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(300))
