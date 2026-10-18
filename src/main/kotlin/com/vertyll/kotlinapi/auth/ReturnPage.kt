@@ -18,7 +18,6 @@ internal object ReturnPage {
 
     private const val MOST_LENGTH = 2048
 
-    /** Spring Security's request cache, in the session, under the name this object saves the page under. */
     fun requestCache(): RequestCache = HttpSessionRequestCache().apply { setSessionAttrName(ATTRIBUTE) }
 
     /**
@@ -37,7 +36,6 @@ internal object ReturnPage {
         request.getSession(false)?.takeIf { it.getAttribute(ATTRIBUTE) is SimpleSavedRequest }?.removeAttribute(ATTRIBUTE)
     }
 
-    /** A path that starts with a single `/`, with no backslash and no control character. */
     fun onThisSite(path: String?): String? =
         path?.takeIf {
             it.startsWith("/") &&

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.testcontainers.containers.GenericContainer
+import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
@@ -81,7 +82,10 @@ class SharedRefreshesTest {
 
     companion object {
         private val ISSUED_AT = Instant.parse("2026-01-01T00:00:00Z")
-        private val container = GenericContainer("redis:8-alpine").withExposedPorts(6379)
+        private val container =
+            GenericContainer(
+                "redis:8-alpine",
+            ).withStartupTimeout(Duration.ofMinutes(2)).withStartupAttempts(3).withExposedPorts(6379)
         private lateinit var connections: LettuceConnectionFactory
         private lateinit var redis: StringRedisTemplate
 
