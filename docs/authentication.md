@@ -34,7 +34,9 @@ sequenceDiagram
    the application has (`Language`).
 2. Keycloak returns to `GET /api/v1/auth/callback`. Spring Security's OAuth2 client exchanges the code, using the
    confidential client `kotlin-api` and its secret, and stores the tokens in the HTTP session.
-3. `SignInCompletion` decodes the access token, mirrors the account into PostgreSQL and redirects to
+3. `SignInCompletion` decodes the access token, mirrors the account into PostgreSQL and redirects to the page of the
+   client the sign-in was started from, named in `return_to` and kept as Spring Security's saved request by
+   `ReturnPage` (a path on the client's own site only, on the address of `application.auth.post-login-url`), or to
    `application.auth.post-login-url`. When the account cannot be written, or Keycloak issued no refresh token, it ends
    the Keycloak session again and redirects with `?error=sign_in_failed`; a lost or forged `state` gives
    `?error=state_mismatch`.

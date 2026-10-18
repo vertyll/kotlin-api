@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtException
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 import org.springframework.stereotype.Component
 import org.springframework.web.util.UriComponentsBuilder
@@ -30,6 +31,7 @@ class SignInCompletion(
 ) : AuthenticationSuccessHandler,
     AuthenticationFailureHandler {
     private val log = LoggerFactory.getLogger(SignInCompletion::class.java)
+    private val requestCache = ReturnPage.requestCache()
 
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,
@@ -66,7 +68,13 @@ class SignInCompletion(
             fail(request, response, authentication, failure.message)
             return
         }
-        response.sendRedirect(auth.postLoginUrl)
+        // Spring Security's saved request, the page ReturnPage kept, or the client's start page; the page is used once.
+        SavedRequestAwareAuthenticationSuccessHandler()
+            .apply {
+                setRequestCache(requestCache)
+                setDefaultTargetUrl(auth.postLoginUrl)
+            }.onAuthenticationSuccess(request, response, authentication)
+        requestCache.removeRequest(request, response)
     }
 
     override fun onAuthenticationFailure(

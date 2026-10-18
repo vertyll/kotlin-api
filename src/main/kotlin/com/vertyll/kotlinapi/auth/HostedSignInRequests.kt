@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 
 class HostedSignInRequests(
     registrations: ClientRegistrationRepository,
+    private val start: String,
 ) : OAuth2AuthorizationRequestResolver {
     private val delegate =
         DefaultOAuth2AuthorizationRequestResolver(
@@ -26,6 +27,7 @@ class HostedSignInRequests(
         clientRegistrationId: String,
     ): OAuth2AuthorizationRequest? {
         val authorization = delegate.resolve(request, clientRegistrationId) ?: return null
+        ReturnPage.remember(request, start)
         return OAuth2AuthorizationRequest
             .from(authorization)
             .additionalParameters { parameters ->

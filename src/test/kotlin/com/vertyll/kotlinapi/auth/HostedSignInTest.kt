@@ -257,9 +257,26 @@ class HostedSignInTest {
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.OK)
     }
 
-    private fun signedIn(accessTokenLifetimeSeconds: Long): Browser {
+    @Test
+    fun `a sign-in returns to the page of the client it was started from`() {
+        signedIn(LIFETIME_SECONDS, returnTo = "/orders/7?tab=lines")
+
+        assertThat(lastLanding).isEqualTo(URI.create(POST_LOGIN_URL).resolve("/orders/7?tab=lines").toString())
+    }
+
+    @Test
+    fun `a sign-in never returns to a page elsewhere`() {
+        signedIn(LIFETIME_SECONDS, returnTo = "//evil.test/")
+
+        assertThat(lastLanding).isEqualTo(POST_LOGIN_URL)
+    }
+
+    private fun signedIn(
+        accessTokenLifetimeSeconds: Long,
+        returnTo: String? = null,
+    ): Browser {
         val browser = Browser()
-        val state = keycloakAnswers(browser, accessTokenLifetimeSeconds)
+        val state = keycloakAnswers(browser, accessTokenLifetimeSeconds, returnTo)
         val preLogin = browser.sessionValues()
 
         val callback = callback(browser, state)
@@ -267,14 +284,20 @@ class HostedSignInTest {
         assertThat(callback).hasStatus(HttpStatus.FOUND)
         assertThat(callback.response.redirectedUrl).doesNotContain("error")
         assertThat(browser.sessionValues()).doesNotContainAnyElementsOf(preLogin)
+        lastLanding = callback.response.redirectedUrl
         return browser
     }
+
+    private var lastLanding: String? = null
 
     private fun keycloakAnswers(
         browser: Browser,
         accessTokenLifetimeSeconds: Long,
+        returnTo: String? = null,
     ): String {
-        val authorization = queryOf(browser.send(mvc.get().uri("/auth/authorize")))
+        val authorize = mvc.get().uri("/auth/authorize")
+        returnTo?.let { authorize.param("return_to", it) }
+        val authorization = queryOf(browser.send(authorize))
         val idToken = idToken(requireNotNull(authorization.getFirst("nonce")))
         whenever(idTokenDecoders.createDecoder(any())).thenReturn(JwtDecoder { idToken })
         whenever(codeTokens.getTokenResponse(any())).thenReturn(tokenResponse(ACCESS_TOKEN, accessTokenLifetimeSeconds))
@@ -359,6 +382,7 @@ class HostedSignInTest {
             .mapValuesTo(LinkedMultiValueMap()) { (_, values) -> values.map { URLDecoder.decode(it, StandardCharsets.UTF_8) } }
 
     private companion object {
+        private const val POST_LOGIN_URL = "http://localhost:8080/api/v1/swagger-ui.html"
         private const val ACCESS_TOKEN = "access-token"
         private const val REFRESHED_ACCESS_TOKEN = "refreshed-access-token"
         private const val REFRESH_TOKEN = "refresh-token"

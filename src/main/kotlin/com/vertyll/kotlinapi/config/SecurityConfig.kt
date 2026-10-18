@@ -1,5 +1,6 @@
 package com.vertyll.kotlinapi.config
 
+import com.vertyll.kotlinapi.auth.AuthProperties
 import com.vertyll.kotlinapi.auth.HostedSignInRequests
 import com.vertyll.kotlinapi.auth.KeycloakIdentity
 import com.vertyll.kotlinapi.auth.SessionAccessTokenFilter
@@ -37,6 +38,7 @@ class SecurityConfig(
         authorizationCodeTokens: OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>,
         signInCompletion: SignInCompletion,
         sessionAccessTokens: SessionAccessTokens,
+        auth: AuthProperties,
     ): SecurityFilterChain {
         val tokenAuthentication = keycloakTokens()
         http
@@ -59,7 +61,7 @@ class SecurityConfig(
             }.oauth2Login { login ->
                 login
                     .loginPage(HostedSignInRequests.AUTHORIZE_PATH)
-                    .authorizationEndpoint { it.authorizationRequestResolver(HostedSignInRequests(clientRegistrations)) }
+                    .authorizationEndpoint { it.authorizationRequestResolver(HostedSignInRequests(clientRegistrations, auth.postLoginUrl)) }
                     .redirectionEndpoint { it.baseUri(CALLBACK_PATH) }
                     .tokenEndpoint { it.accessTokenResponseClient(authorizationCodeTokens) }
                     .authorizedClientRepository(authorizedClients)
