@@ -1,7 +1,6 @@
 package com.vertyll.kotlinapi.auth
 
 import com.vertyll.kotlinapi.common.exception.ApiException
-import com.vertyll.kotlinapi.user.service.UserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
@@ -25,7 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder
 class SignInCompletion(
     private val authorizedClients: OAuth2AuthorizedClientRepository,
     private val accessTokens: JwtDecoder,
-    private val users: UserService,
+    private val accounts: SignedInAccounts,
     private val keycloakSessions: KeycloakSessions,
     private val auth: AuthProperties,
 ) : AuthenticationSuccessHandler,
@@ -51,7 +50,7 @@ class SignInCompletion(
         val failure =
             try {
                 val identity = KeycloakIdentity.from(accessTokens.decode(client.accessToken.tokenValue))
-                users.sync(identity)
+                accounts.signedIn(identity)
                 log.info("User {} signed in", identity.keycloakId)
                 null
             } catch (e: JwtException) {

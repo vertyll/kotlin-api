@@ -109,6 +109,7 @@ image holding it in `/themes`, which the Keycloak theme workflow publishes on a 
 | `auth/AuthConfig`                                               | the client registration and the refresh chain                 |
 | `auth/HostedSignInRequests`                                     | the authorization request: PKCE, sign-up, Keycloak actions    |
 | `auth/SignInCompletion`                                         | mirroring the account after sign-in, and failed sign-ins      |
+| `auth/SignedInAccounts`, `user/service/SignedInUsers`           | the account mirror the sign-in calls, kept by `user`          |
 | `auth/SessionAccessTokenFilter`                                 | turning a session into a token-authorized request             |
 | `auth/SingleFlightRefreshTokenProvider`, `auth/SharedRefreshes` | one refresh per refresh token                                 |
 | `auth/KeycloakSessions`                                         | ending the Keycloak session                                   |
