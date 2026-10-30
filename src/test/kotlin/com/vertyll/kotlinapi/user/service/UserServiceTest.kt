@@ -27,7 +27,7 @@ class UserServiceTest {
             roles = setOf("USER", "UNKNOWN"),
         )
     private val roleService =
-        mock<RoleService> { on { getOrCreateDefaultRole(any()) } doAnswer { Role(name = it.getArgument(0)) } }
+        mock<RoleService> { on { getOrCreateDefaultRole(any()) } doAnswer { invocation -> Role(name = invocation.getArgument(0)) } }
 
     @Test
     fun `the first sign-in creates the account with the roles the application knows`() {

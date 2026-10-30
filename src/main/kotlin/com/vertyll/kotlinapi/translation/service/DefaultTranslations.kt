@@ -18,7 +18,7 @@ object DefaultTranslations {
         val keys = byLanguage.getValue(Language.PL).keys.toSortedSet()
         byLanguage.forEach { (language, messages) ->
             check(messages.keys == keys) {
-                "Translations ${language.code} differ in keys: ${(keys - messages.keys) + (messages.keys - keys)}"
+                "Translations ${language.code} differ in keys: ${keys - messages.keys + (messages.keys - keys)}"
             }
         }
         return keys.associateWithTo(sortedMapOf()) { key ->

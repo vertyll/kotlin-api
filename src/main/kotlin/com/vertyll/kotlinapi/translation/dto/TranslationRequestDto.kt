@@ -12,9 +12,9 @@ data class TranslationRequestDto(
     @field:Size(max = MAX_LENGTH, message = "validation.translation.tooLong")
     val en: String,
 ) {
-    companion object {
-        const val MAX_LENGTH = 2000
-    }
-
     fun toLocalizedText() = LocalizedText(pl, en)
+
+    private companion object {
+        private const val MAX_LENGTH = 2000
+    }
 }

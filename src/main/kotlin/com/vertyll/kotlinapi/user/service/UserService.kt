@@ -33,7 +33,7 @@ class UserService(
                         email = identity.email,
                     )
                 }
-        user.syncIdentity(identity.email, identity.username, roles)
+        user.syncIdentity(email = identity.email, username = identity.username, roles = roles)
         return mapToDto(userRepository.save(user))
     }
 

@@ -17,15 +17,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
-    companion object {
-        const val VALIDATION_FAILED = "errors.common.validationFailed"
-        const val BAD_REQUEST = "errors.common.badRequest"
-        const val UNEXPECTED = "errors.common.unexpected"
-        const val INVALID_VALUE = "validation.invalid"
-        const val ACCESS_DENIED = "errors.auth.accessDenied"
-        private val CONSTRAINT_METADATA = setOf("message", "groups", "payload")
-    }
-
     @ExceptionHandler(ApiException::class)
     fun handleApiException(ex: ApiException): ProblemDetail = Problems.of(ex.status, ex.messageKey, ex.args)
 
@@ -80,5 +71,14 @@ class GlobalExceptionHandler {
         }
         log.error("Unhandled exception", ex)
         return Problems.of(HttpStatus.INTERNAL_SERVER_ERROR, UNEXPECTED)
+    }
+
+    companion object {
+        const val VALIDATION_FAILED = "errors.common.validationFailed"
+        const val BAD_REQUEST = "errors.common.badRequest"
+        const val UNEXPECTED = "errors.common.unexpected"
+        const val INVALID_VALUE = "validation.invalid"
+        const val ACCESS_DENIED = "errors.auth.accessDenied"
+        private val CONSTRAINT_METADATA = setOf("message", "groups", "payload")
     }
 }

@@ -28,7 +28,7 @@ class RoleServiceTest {
         val repository =
             mock<RoleRepository> {
                 on { findByName("USER") } doReturn Optional.empty()
-                on { save(any<Role>()) } doAnswer { it.getArgument(0) }
+                on { save(any<Role>()) } doAnswer { invocation -> invocation.getArgument(0) }
             }
 
         assertEquals("USER", RoleService(repository).getOrCreateDefaultRole("USER").name)

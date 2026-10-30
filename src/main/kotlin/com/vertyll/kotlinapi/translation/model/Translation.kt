@@ -43,9 +43,9 @@ class Translation(
     var updatedAt: Instant = now
         protected set
 
-    fun messages(): LocalizedText = LocalizedText(messagePl, messageEn)
+    fun messages(): LocalizedText = LocalizedText(pl = messagePl, en = messageEn)
 
-    fun defaults(): LocalizedText = LocalizedText(defaultPl, defaultEn)
+    fun defaults(): LocalizedText = LocalizedText(pl = defaultPl, en = defaultEn)
 
     fun refreshDefaults(
         newDefaults: LocalizedText,
@@ -73,5 +73,7 @@ class Translation(
         updatedAt = now
     }
 
-    fun reset(now: Instant) = customize(defaults(), now)
+    fun reset(now: Instant) {
+        customize(defaults(), now)
+    }
 }

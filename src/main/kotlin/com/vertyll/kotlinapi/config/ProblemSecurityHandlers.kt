@@ -21,22 +21,21 @@ class ProblemSecurityHandlers(
     private val objectMapper: ObjectMapper,
 ) : AuthenticationEntryPoint,
     AccessDeniedHandler {
-    companion object {
-        const val AUTHENTICATION_REQUIRED = "errors.auth.authenticationRequired"
-        const val ACCESS_DENIED = "errors.auth.accessDenied"
-    }
-
     override fun commence(
         request: HttpServletRequest,
         response: HttpServletResponse,
         authException: AuthenticationException,
-    ) = write(response, HttpStatus.UNAUTHORIZED, AUTHENTICATION_REQUIRED)
+    ) {
+        write(response, HttpStatus.UNAUTHORIZED, AUTHENTICATION_REQUIRED)
+    }
 
     override fun handle(
         request: HttpServletRequest,
         response: HttpServletResponse,
         accessDeniedException: AccessDeniedException,
-    ) = write(response, HttpStatus.FORBIDDEN, ACCESS_DENIED)
+    ) {
+        write(response, HttpStatus.FORBIDDEN, ACCESS_DENIED)
+    }
 
     private fun write(
         response: HttpServletResponse,
@@ -46,5 +45,10 @@ class ProblemSecurityHandlers(
         response.status = status.value()
         response.contentType = MediaType.APPLICATION_PROBLEM_JSON_VALUE
         objectMapper.writeValue(response.outputStream, Problems.of(status, messageKey))
+    }
+
+    companion object {
+        const val AUTHENTICATION_REQUIRED = "errors.auth.authenticationRequired"
+        const val ACCESS_DENIED = "errors.auth.accessDenied"
     }
 }

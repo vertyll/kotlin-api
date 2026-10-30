@@ -6,10 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 import java.util.Optional
 
 class ApplicationAuditAware : AuditorAware<String> {
-    private companion object {
-        private const val SYSTEM_ACCOUNT = "SYSTEM"
-    }
-
     override fun getCurrentAuditor(): Optional<String> {
         val authentication = SecurityContextHolder.getContext().authentication
 
@@ -24,5 +20,9 @@ class ApplicationAuditAware : AuditorAware<String> {
             .ofNullable(authentication.name)
             .filter { name -> name.isNotBlank() }
             .or { Optional.of(SYSTEM_ACCOUNT) }
+    }
+
+    private companion object {
+        private const val SYSTEM_ACCOUNT = "SYSTEM"
     }
 }

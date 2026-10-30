@@ -10,5 +10,7 @@ class TranslationSynchronizer(
     private val translationService: TranslationService,
     private val objectMapper: ObjectMapper,
 ) : ApplicationRunner {
-    override fun run(args: ApplicationArguments) = translationService.synchronize(DefaultTranslations.load(objectMapper))
+    override fun run(args: ApplicationArguments) {
+        translationService.synchronize(DefaultTranslations.load(objectMapper))
+    }
 }

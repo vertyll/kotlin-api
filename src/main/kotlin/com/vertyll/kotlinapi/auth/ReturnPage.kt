@@ -37,11 +37,11 @@ internal object ReturnPage {
     }
 
     fun onThisSite(path: String?): String? =
-        path?.takeIf {
-            it.startsWith("/") &&
-                !it.startsWith("//") &&
-                '\\' !in it &&
-                it.none(Char::isISOControl) &&
-                it.length <= MOST_LENGTH
+        path?.takeIf { candidate ->
+            candidate.startsWith("/") &&
+                !candidate.startsWith("//") &&
+                '\\' !in candidate &&
+                candidate.none(Char::isISOControl) &&
+                candidate.length <= MOST_LENGTH
         }
 }

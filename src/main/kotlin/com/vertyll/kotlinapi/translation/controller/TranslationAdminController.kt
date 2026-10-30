@@ -40,5 +40,7 @@ class TranslationAdminController(
     @Operation(summary = "Restore the shipped default")
     fun reset(
         @PathVariable key: String,
-    ) = translationService.reset(key)
+    ) {
+        translationService.reset(key)
+    }
 }

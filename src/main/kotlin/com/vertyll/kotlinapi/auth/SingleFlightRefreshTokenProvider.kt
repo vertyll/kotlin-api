@@ -59,10 +59,10 @@ class SingleFlightRefreshTokenProvider(
                 val access = refreshed.accessToken
                 val issuedAt = access.issuedAt ?: clock.instant()
                 SharedRefreshes.TokenPair(
-                    access.tokenValue,
-                    refreshed.refreshToken?.tokenValue ?: refreshToken.tokenValue,
-                    issuedAt,
-                    access.expiresAt ?: issuedAt,
+                    accessToken = access.tokenValue,
+                    refreshToken = refreshed.refreshToken?.tokenValue ?: refreshToken.tokenValue,
+                    issuedAt = issuedAt,
+                    expiresAt = access.expiresAt ?: issuedAt,
                 )
             }
         return OAuth2AuthorizedClient(

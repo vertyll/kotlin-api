@@ -44,8 +44,8 @@ class SecurityConfig(
         http
             .cors { it.configurationSource(corsConfigurationSource) }
             .csrf { it.disable() }
-            .authorizeHttpRequests { auth ->
-                auth
+            .authorizeHttpRequests { requests ->
+                requests
                     .requestMatchers(
                         "/auth/**",
                         "/legal/**",
@@ -72,8 +72,8 @@ class SecurityConfig(
                     .jwt { it.jwtAuthenticationConverter(tokenAuthentication) }
                     .authenticationEntryPoint(problemSecurityHandlers)
                     .accessDeniedHandler(problemSecurityHandlers)
-            }.exceptionHandling {
-                it
+            }.exceptionHandling { exceptions ->
+                exceptions
                     .authenticationEntryPoint(problemSecurityHandlers)
                     .accessDeniedHandler(problemSecurityHandlers)
             }.requestCache(RequestCacheConfigurer<HttpSecurity>::disable)

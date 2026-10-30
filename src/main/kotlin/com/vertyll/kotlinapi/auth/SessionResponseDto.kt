@@ -6,6 +6,7 @@ data class SessionResponseDto(
     val roles: Set<String>,
 ) {
     companion object {
-        fun from(identity: KeycloakIdentity): SessionResponseDto = SessionResponseDto(identity.keycloakId, identity.email, identity.roles)
+        fun from(identity: KeycloakIdentity): SessionResponseDto =
+            SessionResponseDto(userId = identity.keycloakId, email = identity.email, roles = identity.roles)
     }
 }

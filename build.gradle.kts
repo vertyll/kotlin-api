@@ -75,6 +75,11 @@ detekt {
     toolVersion = libs.versions.detekt.get()
     config.setFrom(files("$projectDir/config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
+    allRules = true
+}
+
+tasks.named("detekt") {
+    dependsOn("detektMain", "detektTest")
 }
 
 configurations.matching { it.name.startsWith("ktlint") }.configureEach {

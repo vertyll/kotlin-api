@@ -18,13 +18,6 @@ class TranslationService(
     private val repository: TranslationRepository,
     private val clock: Clock,
 ) {
-    companion object {
-        const val TRANSLATION_NOT_FOUND = "errors.translation.notFound"
-        const val LANGUAGE_NOT_FOUND = "errors.translation.languageNotFound"
-        const val INVALID_MESSAGE = "errors.translation.invalidMessage"
-        const val UNKNOWN_PLACEHOLDERS = "errors.translation.unknownPlaceholders"
-    }
-
     @Transactional(readOnly = true)
     fun messages(languageCode: String): Map<String, String> {
         val language =
@@ -60,7 +53,9 @@ class TranslationService(
     }
 
     @Transactional
-    fun reset(key: String) = find(key).reset(Instant.now(clock))
+    fun reset(key: String) {
+        find(key).reset(Instant.now(clock))
+    }
 
     /**
      * Brings the stored catalogue in line with the shipped defaults: adds new keys, adopts changed
@@ -83,4 +78,11 @@ class TranslationService(
 
     private fun find(key: String): Translation =
         repository.findById(key).orElseThrow { ApiException(TRANSLATION_NOT_FOUND, HttpStatus.NOT_FOUND) }
+
+    companion object {
+        const val TRANSLATION_NOT_FOUND = "errors.translation.notFound"
+        const val LANGUAGE_NOT_FOUND = "errors.translation.languageNotFound"
+        const val INVALID_MESSAGE = "errors.translation.invalidMessage"
+        const val UNKNOWN_PLACEHOLDERS = "errors.translation.unknownPlaceholders"
+    }
 }

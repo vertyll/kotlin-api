@@ -69,6 +69,8 @@ class HostedSignInTest {
     @MockitoBean
     private lateinit var keycloakSessions: KeycloakSessions
 
+    private var lastLanding: String? = null
+
     @BeforeEach
     fun keycloakIssuesTokens() {
         whenever(jwtDecoder.decode(ACCESS_TOKEN)).thenReturn(accessToken(ACCESS_TOKEN))
@@ -288,8 +290,6 @@ class HostedSignInTest {
         return browser
     }
 
-    private var lastLanding: String? = null
-
     private fun keycloakAnswers(
         browser: Browser,
         accessTokenLifetimeSeconds: Long,
@@ -367,7 +367,7 @@ class HostedSignInTest {
             .withTokenValue(value)
             .header("alg", "RS256")
             .subject(SUBJECT)
-            .apply { email?.let { claim("email", it) } }
+            .apply { if (email != null) claim("email", email) }
             .claim("preferred_username", "ada")
             .claim("realm_access", mapOf("roles" to listOf("ADMIN")))
             .issuedAt(Instant.now())
