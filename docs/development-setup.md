@@ -72,6 +72,10 @@ The image (`Dockerfile`) runs with the `prod` profile, which takes its settings 
 | `FRONTEND_URL`                                                          | the only origin CORS admits                 |
 | `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM` | SMTP with STARTTLS                          |
 
+Redis over TLS trusts the JVM's default certificate authorities. A cluster whose Redis presents a certificate from its
+own internal authority needs that authority as an SSL bundle, `spring.data.redis.ssl.bundle`, with its truststore
+mounted into the pod; the application is not deployed yet, so the profile names none.
+
 ## Documentation checks
 
 The Markdown is formatted and linted with [markright](https://github.com/vertyll/markright), at the version the

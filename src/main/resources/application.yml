@@ -3,6 +3,13 @@ spring:
     name: kotlin-api
   profiles:
     default: local
+  threads:
+    virtual:
+      enabled: true
+  http:
+    clients:
+      connect-timeout: 5s
+      read-timeout: 30s
   jpa:
     open-in-view: false
     hibernate:
@@ -12,6 +19,10 @@ spring:
         default_batch_fetch_size: 50
   flyway:
     validate-on-migrate: true
+  data:
+    redis:
+      timeout: 2s
+      connect-timeout: 2s
   session:
     data:
       redis:
@@ -39,7 +50,9 @@ server:
     session:
       timeout: 10h
       cookie:
-        name: KOTLIN_API_SESSION
+        name: __Host-KOTLIN_API_SESSION
+        # The context path would otherwise be the cookie's path, which the __Host- prefix forbids.
+        path: /
         http-only: true
         secure: true
         same-site: lax

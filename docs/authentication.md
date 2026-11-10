@@ -41,7 +41,9 @@ sequenceDiagram
    the Keycloak session again and redirects with `?error=sign_in_failed`; a lost or forged `state` gives
    `?error=state_mismatch`.
 
-The browser holds only the `KOTLIN_API_SESSION` cookie: `HttpOnly`, `SameSite=Lax`, `Secure` outside the local profile.
+The browser holds only the `__Host-KOTLIN_API_SESSION` cookie: `HttpOnly`, `SameSite=Lax`, `Secure`, `Path=/` and no
+`Domain`, so the `/api/v1` context path does not become its path. The local profile runs on plain HTTP, so its cookie
+is `KOTLIN_API_SESSION` without `Secure`, as the `__Host-` prefix requires `Secure`.
 
 ## Every request is authorized by a token
 
@@ -57,6 +59,13 @@ A request carries the token in one of two ways:
 | A client of its own      | `Authorization: Bearer` with a token it obtained from Keycloak itself                                 |
 
 Either way the decision rests on the token alone, not on the session, so any instance can serve any request.
+
+A request without a token is answered `401` with `WWW-Authenticate: Bearer`, one with a token it refuses `401` with
+`error="invalid_token"`, and one whose token lacks the permission `403` with `error="insufficient_scope"`, each with a
+problem document ([Error responses](mechanisms/error-responses.md)).
+
+Keycloak is called, for its metadata, its keys and its tokens, with the timeouts of `spring.http.clients`: five seconds
+to connect and thirty to answer.
 
 ## Sessions and refreshing
 

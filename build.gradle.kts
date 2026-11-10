@@ -44,6 +44,7 @@ dependencies {
     }
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.starter.webmvc)
+    implementation(libs.spring.boot.starter.restclient)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
     implementation(libs.icu4j)
     implementation(libs.spring.boot.starter.flyway) {

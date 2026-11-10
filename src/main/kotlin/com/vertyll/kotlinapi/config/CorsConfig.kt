@@ -18,7 +18,6 @@ class CorsConfig(
                 allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 allowedHeaders = listOf("*")
                 allowCredentials = true
-                exposedHeaders = listOf("Set-Cookie")
             }
 
         val source = UrlBasedCorsConfigurationSource()

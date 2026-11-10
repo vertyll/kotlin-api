@@ -20,6 +20,8 @@ server:
   servlet:
     session:
       cookie:
+        # The __Host- prefix requires Secure, which plain HTTP cannot have.
+        name: KOTLIN_API_SESSION
         secure: false
 
 springdoc:
