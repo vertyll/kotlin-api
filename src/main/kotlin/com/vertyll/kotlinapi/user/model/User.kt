@@ -19,7 +19,7 @@ class User(
     var username: String,
     @Column(nullable = false, unique = true)
     var email: String,
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "user_role",
         joinColumns = [JoinColumn(name = "user_id")],
