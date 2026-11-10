@@ -10,6 +10,7 @@ import org.springframework.security.jackson.SecurityJacksonModules
 import org.springframework.security.web.savedrequest.SimpleSavedRequest
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator
+import java.net.URL
 
 /**
  * How the attributes of a session are written to Redis: as JSON, never as Java serialization.
@@ -51,6 +52,7 @@ class SessionStoreConfig {
                             BasicPolymorphicTypeValidator
                                 .builder()
                                 .allowIfSubType(JDK_IMMUTABLE_COLLECTIONS)
+                                .allowIfSubType(URL::class.java)
                                 .allowIfSubType(SimpleSavedRequest::class.java),
                         ),
                     ).addMixIn(SimpleSavedRequest::class.java, SimpleSavedRequestMixin::class.java)

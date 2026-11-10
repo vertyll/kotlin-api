@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.security.oauth2.core.oidc.OidcIdToken
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.security.web.savedrequest.SimpleSavedRequest
+import java.net.URI
 import java.time.Instant
 
 class SessionStoreConfigTest {
@@ -38,7 +39,7 @@ class SessionStoreConfigTest {
 
     @Test
     fun theSecurityContextOfASignInSurvivesARoundTripThroughTheStore() {
-        val idToken = OidcIdToken("id-token", ISSUED, EXPIRES, mapOf("sub" to "ada", "iss" to "https://kc"))
+        val idToken = OidcIdToken("id-token", ISSUED, EXPIRES, mapOf("sub" to "ada", "iss" to URI.create("https://kc").toURL()))
         val user = DefaultOidcUser(listOf(SimpleGrantedAuthority("OIDC_USER")), idToken)
         val context = SecurityContextImpl(OAuth2AuthenticationToken(user, user.authorities, REGISTRATION_ID))
 
