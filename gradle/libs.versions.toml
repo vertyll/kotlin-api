@@ -1,6 +1,6 @@
 [versions]
 jacoco = "0.8.16"
-sonarqube = "7.5.0.8588"
+sonarqube = "7.6.0.18749"
 java = "25"
 kotlin = "2.4.10"
 spring-boot = "4.1.2"
