@@ -17,6 +17,7 @@ icu4j = "79.1"
 [libraries]
 netty-resolver-dns-native-macos = { module = "io.netty:netty-resolver-dns-native-macos" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
@@ -47,6 +48,7 @@ kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter", version.ref = "testcontainers" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -69,4 +71,4 @@ test-starters = [
     "spring-boot-starter-flyway-test",
     "spring-boot-testcontainers"
 ]
-testcontainers = ["testcontainers-postgresql"]
+testcontainers = ["testcontainers-junit-jupiter", "testcontainers-postgresql"]

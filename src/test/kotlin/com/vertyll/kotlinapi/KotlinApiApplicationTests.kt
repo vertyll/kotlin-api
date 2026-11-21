@@ -7,7 +7,7 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(PostgresTestContainer::class, RedisTestContainer::class)
+@Import(TestcontainersConfiguration::class)
 class KotlinApiApplicationTests {
     @Test
     fun contextLoads() {

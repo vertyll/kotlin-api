@@ -1,7 +1,6 @@
 package com.vertyll.kotlinapi.auth
 
-import com.vertyll.kotlinapi.PostgresTestContainer
-import com.vertyll.kotlinapi.RedisTestContainer
+import com.vertyll.kotlinapi.TestcontainersConfiguration
 import com.vertyll.kotlinapi.user.repository.UserRepository
 import jakarta.servlet.http.Cookie
 import org.assertj.core.api.Assertions.assertThat
@@ -46,7 +45,7 @@ import java.time.Instant
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(PostgresTestContainer::class, RedisTestContainer::class)
+@Import(TestcontainersConfiguration::class)
 class HostedSignInTest {
     @Autowired
     private lateinit var mvc: MockMvcTester
