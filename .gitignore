@@ -66,3 +66,8 @@ logs/
 
 ### Compiled class files ###
 *.class
+
+### SonarQube ###
+.scannerwork/
+.sonar/
+.sonarlint/
