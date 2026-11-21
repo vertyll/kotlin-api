@@ -5,6 +5,7 @@ import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.boot.security.oauth2.server.resource.autoconfigure.JwkSetUriJwtDecoderBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.DelegatingOAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
@@ -36,7 +37,12 @@ class AuthConfig {
     @Bean
     fun keycloakRestClient(restClients: RestClient.Builder): RestClient = restClients.build()
 
-    /** The access token's keys, and the issuer's metadata that names them, are fetched with the same timeouts. */
+    /**
+     * The access token's keys, and the issuer's metadata that names them, are fetched with the same timeouts. Spring
+     * Security 7.2 takes only `RestOperations` for the key set; `RestClient` follows in
+     * https://github.com/spring-projects/spring-security/issues/19027.
+     */
+    @Suppress("DEPRECATION")
     @Bean
     fun timedJwkSetUri(restTemplates: RestTemplateBuilder): JwkSetUriJwtDecoderBuilderCustomizer =
         JwkSetUriJwtDecoderBuilderCustomizer { it.restOperations(restTemplates.build()) }
@@ -108,6 +114,7 @@ class AuthConfig {
             .configureMessageConverters { converters ->
                 converters.addCustomConverter(FormHttpMessageConverter())
                 converters.addCustomConverter(OAuth2AccessTokenResponseHttpMessageConverter())
-            }.defaultStatusHandler(OAuth2ErrorResponseErrorHandler())
-            .build()
+            }.defaultStatusHandler(HttpStatusCode::isError) { request, response ->
+                OAuth2ErrorResponseErrorHandler().handleError(request.uri, request.method, response)
+            }.build()
 }
