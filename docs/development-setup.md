@@ -46,7 +46,8 @@ filled from `src/main/resources/i18n`.
 The Swagger UI is at `http://localhost:8080/api/v1/swagger-ui.html` (local profile only). Open
 `http://localhost:8080/api/v1/auth/authorize` to sign in; Keycloak returns you to the Swagger UI.
 
-Signing in through the browser leaves a session cookie, so Swagger's "Try it out" calls run as the signed-in user.
+Signing in through the browser leaves a session cookie, so Swagger's "Try it out" calls run as the signed-in user, and
+send the CSRF token in `X-XSRF-TOKEN` with every write ([Cross-site requests](mechanisms/cross-site-requests.md)).
 
 ## Checks
 

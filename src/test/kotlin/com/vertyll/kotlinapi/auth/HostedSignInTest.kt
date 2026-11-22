@@ -232,18 +232,50 @@ class HostedSignInTest {
     }
 
     @Test
+    fun `a write with the session and without the CSRF token is refused`() {
+        val browser = signedIn(LIFETIME_SECONDS)
+
+        assertThat(browser.send(mvc.post().uri(LOGOUT_PATH))).hasStatus(HttpStatus.FORBIDDEN)
+        verify(keycloakSessions, never()).revoke(REFRESH_TOKEN)
+        assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.OK)
+    }
+
+    @Test
+    fun `a write with another Authorization scheme still needs the CSRF token`() {
+        val browser = signedIn(LIFETIME_SECONDS)
+
+        assertThat(browser.send(mvc.post().uri(LOGOUT_PATH).header("Authorization", "Basic YWRhOnNlY3JldA==")))
+            .hasStatus(HttpStatus.FORBIDDEN)
+        verify(keycloakSessions, never()).revoke(REFRESH_TOKEN)
+    }
+
+    @Test
+    fun `a client with its own token writes without the CSRF token`() {
+        assertThat(mvc.post().uri(LOGOUT_PATH).header("Authorization", "Bearer $ACCESS_TOKEN"))
+            .hasStatus(HttpStatus.NO_CONTENT)
+    }
+
+    @Test
     fun `a cross-site write is not given the session token`() {
         val browser = signedIn(LIFETIME_SECONDS)
 
-        assertThat(browser.send(mvc.post().uri("/users/me").header("Sec-Fetch-Site", "cross-site")))
-            .hasStatus(HttpStatus.UNAUTHORIZED)
+        assertThat(
+            browser.send(
+                mvc
+                    .post()
+                    .uri("/users/me")
+                    .header(CSRF_HEADER, browser.csrfToken())
+                    .header("Sec-Fetch-Site", "cross-site"),
+            ),
+        ).hasStatus(HttpStatus.UNAUTHORIZED)
     }
 
     @Test
     fun `logout revokes the refresh token and ends the session`() {
         val browser = signedIn(LIFETIME_SECONDS)
 
-        assertThat(browser.send(mvc.post().uri("/auth/logout"))).hasStatus(HttpStatus.NO_CONTENT)
+        assertThat(browser.send(mvc.post().uri(LOGOUT_PATH).header(CSRF_HEADER, browser.csrfToken())))
+            .hasStatus(HttpStatus.NO_CONTENT)
         verify(keycloakSessions).revoke(REFRESH_TOKEN)
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.NO_CONTENT)
     }
@@ -252,8 +284,15 @@ class HostedSignInTest {
     fun `logout sent from another site leaves the session`() {
         val browser = signedIn(LIFETIME_SECONDS)
 
-        assertThat(browser.send(mvc.post().uri("/auth/logout").header("Sec-Fetch-Site", "same-site")))
-            .hasStatus(HttpStatus.FORBIDDEN)
+        assertThat(
+            browser.send(
+                mvc
+                    .post()
+                    .uri(LOGOUT_PATH)
+                    .header(CSRF_HEADER, browser.csrfToken())
+                    .header("Sec-Fetch-Site", "same-site"),
+            ),
+        ).hasStatus(HttpStatus.FORBIDDEN)
         verify(keycloakSessions, never()).revoke(REFRESH_TOKEN)
         assertThat(browser.send(mvc.get().uri("/auth/session"))).hasStatus(HttpStatus.OK)
     }
@@ -330,6 +369,8 @@ class HostedSignInTest {
         }
 
         fun sessionValues(): List<String> = cookies.values.map { it.value }
+
+        fun csrfToken(): String = requireNotNull(cookies[CSRF_COOKIE]) { "the browser holds no CSRF cookie" }.value
     }
 
     private fun tokenResponse(
@@ -392,5 +433,8 @@ class HostedSignInTest {
         private const val CHALLENGE_LENGTH = 43
         private const val LIFETIME_SECONDS = 300L
         private const val EXPIRING_SECONDS = 5L
+        private const val LOGOUT_PATH = "/auth/logout"
+        private const val CSRF_COOKIE = "__Host-XSRF-TOKEN"
+        private const val CSRF_HEADER = "X-XSRF-TOKEN"
     }
 }

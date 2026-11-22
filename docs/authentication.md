@@ -41,9 +41,10 @@ sequenceDiagram
    the Keycloak session again and redirects with `?error=sign_in_failed`; a lost or forged `state` gives
    `?error=state_mismatch`.
 
-The browser holds only the `__Host-KOTLIN_API_SESSION` cookie: `HttpOnly`, `SameSite=Lax`, `Secure`, `Path=/` and no
-`Domain`, so the `/api/v1` context path does not become its path. The local profile runs on plain HTTP, so its cookie
-is `KOTLIN_API_SESSION` without `Secure`, as the `__Host-` prefix requires `Secure`.
+The browser holds only the `__Host-KOTLIN_API_SESSION` cookie, `HttpOnly`, and the `__Host-XSRF-TOKEN` cookie of the
+[CSRF token](mechanisms/cross-site-requests.md#the-csrf-token): both `SameSite=Lax`, `Secure`, `Path=/` and no
+`Domain`, so the `/api/v1` context path does not become their path. The local profile runs on plain HTTP, so its
+cookies are `KOTLIN_API_SESSION` and `XSRF-TOKEN` without `Secure`, as the `__Host-` prefix requires `Secure`.
 
 ## Every request is authorized by a token
 
@@ -79,7 +80,8 @@ local one.
 
 ## Cross-site requests
 
-An unsafe request from another site gets no token: [Cross-site requests](mechanisms/cross-site-requests.md).
+A write the session authenticates carries the CSRF token in `X-XSRF-TOKEN`, a client with its own bearer token needs
+none, and an unsafe request from another site gets no token: [Cross-site requests](mechanisms/cross-site-requests.md).
 
 ## The sign-in pages
 
@@ -120,8 +122,11 @@ image holding it in `/themes`, which the Keycloak theme workflow publishes on a 
 | `auth/SignInCompletion`                                         | mirroring the account after sign-in, and failed sign-ins      |
 | `auth/SignedInAccounts`, `user/service/SignedInUsers`           | the account mirror the sign-in calls, kept by `user`          |
 | `auth/SessionAccessTokenFilter`                                 | turning a session into a token-authorized request             |
+| `auth/BearerTokenRequests`                                      | the requests with a bearer token, which need no CSRF token    |
 | `auth/SingleFlightRefreshTokenProvider`, `auth/SharedRefreshes` | one refresh per refresh token                                 |
 | `auth/KeycloakSessions`                                         | ending the Keycloak session                                   |
 
-`HostedSignInTest`, `KeycloakIdentityTest` and `SharedRefreshesTest` cover the sign-in request, the identity read from a
-token and the refresh across instances (on a Redis container).
+`HostedSignInTest`, `KeycloakIdentityTest` and `SharedRefreshesTest` cover the sign-in request, the CSRF token, the
+identity read from a token and the refresh across instances (on a Redis container); `BearerTokenRequestsTest` covers
+which requests need no CSRF token, and `CsrfCookieTest` and `LocalCsrfCookieTest` the CSRF cookie's name and attributes,
+prefixed and local, from the embedded server.

@@ -1,11 +1,14 @@
 package com.vertyll.kotlinapi.config
 
 import com.vertyll.kotlinapi.auth.AuthProperties
+import com.vertyll.kotlinapi.auth.BearerTokenRequests
 import com.vertyll.kotlinapi.auth.HostedSignInRequests
 import com.vertyll.kotlinapi.auth.KeycloakIdentity
 import com.vertyll.kotlinapi.auth.SessionAccessTokenFilter
 import com.vertyll.kotlinapi.auth.SessionAccessTokens
 import com.vertyll.kotlinapi.auth.SignInCompletion
+import org.springframework.boot.web.server.Cookie
+import org.springframework.boot.web.server.autoconfigure.ServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -21,6 +24,7 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.web.cors.CorsConfigurationSource
 
 @Configuration
@@ -39,12 +43,17 @@ class SecurityConfig(
         signInCompletion: SignInCompletion,
         sessionAccessTokens: SessionAccessTokens,
         auth: AuthProperties,
+        server: ServerProperties,
     ): SecurityFilterChain {
         val tokenAuthentication = keycloakTokens()
         http
             .cors { it.configurationSource(corsConfigurationSource) }
-            .csrf { it.disable() }
-            .authorizeHttpRequests { requests ->
+            .csrf { csrf ->
+                csrf
+                    .spa()
+                    .csrfTokenRepository(csrfTokens(server.servlet.session.cookie))
+                    .ignoringRequestMatchers(BearerTokenRequests())
+            }.authorizeHttpRequests { requests ->
                 requests
                     .requestMatchers(
                         "/auth/**",
@@ -93,7 +102,21 @@ class SecurityConfig(
             }
         }
 
+    private fun csrfTokens(sessionCookie: Cookie): CookieCsrfTokenRepository {
+        val secure = sessionCookie.secure == true
+        // Not HttpOnly, as a script must read the token, which is no credential. The __Host- prefix keeps a sibling host
+        // from planting its own token; it requires Secure, so the local profile over plain HTTP gets the bare name.
+        return CookieCsrfTokenRepository.withHttpOnlyFalse().apply {
+            setCookieName(if (secure) HOST_PREFIX + CSRF_COOKIE else CSRF_COOKIE)
+            setCookiePath("/")
+            setCookieCustomizer { cookie -> cookie.sameSite(CSRF_COOKIE_SAME_SITE).secure(secure) }
+        }
+    }
+
     private companion object {
         private const val CALLBACK_PATH = "/auth/callback"
+        private const val CSRF_COOKIE = "XSRF-TOKEN"
+        private const val HOST_PREFIX = "__Host-"
+        private const val CSRF_COOKIE_SAME_SITE = "Lax"
     }
 }

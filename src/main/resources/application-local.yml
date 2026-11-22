@@ -29,6 +29,8 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
+    csrf:
+      cookie-name: XSRF-TOKEN
 
 application:
   mail:

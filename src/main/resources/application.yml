@@ -73,6 +73,11 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+    # Sends the CSRF cookie back in X-XSRF-TOKEN, which a write with the session needs; its name follows the session
+    # cookie's Secure flag, as the filter chain sets it.
+    csrf:
+      enabled: true
+      cookie-name: __Host-XSRF-TOKEN
 
 application:
   redis:

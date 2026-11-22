@@ -23,7 +23,7 @@ Every document in this repository, the module it belongs to, and what it covers.
 
 | Document                                                      | Module | Kind      | Covers                                                                                                     |
 |---------------------------------------------------------------|--------|-----------|------------------------------------------------------------------------------------------------------------|
-| [Cross-site requests](docs/mechanisms/cross-site-requests.md) | —      | mechanism | Why a forged request from another site cannot act with the user's session, without CSRF tokens.            |
+| [Cross-site requests](docs/mechanisms/cross-site-requests.md) | —      | mechanism | Why a forged request from another site cannot act with the user's session.                                 |
 | [Error responses](docs/mechanisms/error-responses.md)         | —      | mechanism | What the API answers when it refuses a request, and how a client turns that into text.                     |
 | [Token refresh](docs/mechanisms/token-refresh.md)             | —      | mechanism | How the session keeps a valid access token without signing the user out when requests race.                |
 | [Translation catalog](docs/mechanisms/translation-catalog.md) | —      | mechanism | Where the text behind every message key comes from, and how an administrator's edits survive a deployment. |
